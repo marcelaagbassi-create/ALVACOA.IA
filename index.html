@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVACOA - IA Auto-apprenante</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar">A</div>
+            <div class="header-info">
+                <h2>ALVACOA</h2>
+                <p><span class="status-dot"></span> En ligne • v1.0</p>
+            </div>
+            <div class="header-actions">
+                <button class="train-btn" onclick="ModuleTrainer.open()">🧠 Apprendre</button>
+                <button class="modules-btn" onclick="ModuleManager.showPanel()">📦 Modules</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" 
+                   placeholder="Écrivez votre message..." onkeydown="Core.handleKeyDown(event)">
+            <button class="send-btn" onclick="Core.sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <div class="module-panel" id="modulePanel">
+        <div class="module-panel-content">
+            <h3>📦 Modules installés</h3>
+            <div id="moduleList"></div>
+            <button onclick="ModuleManager.hidePanel()">Fermer</button>
+        </div>
+    </div>
+
+    <div class="modal" id="trainModal">
+        <div class="modal-content">
+            <h3>🧠 Apprendre à ALVACOA</h3>
+            <input type="text" id="trainQuestion" placeholder="Mot-clé ou question">
+            <textarea id="trainAnswer" placeholder="Réponse..."></textarea>
+            <button onclick="ModuleTrainer.save()">✅ Enregistrer</button>
+            <button onclick="ModuleTrainer.close()">❌ Fermer</button>
+        </div>
+    </div>
+
+    <!-- Modules -->
+    <script src="modules/core.js"></script>
+    <script src="modules/calculator.js"></script>
+    <script src="modules/writer.js"></script>
+    <script src="modules/trainer.js"></script>
+    <script src="modules/knowledge.js"></script>
+    <script src="modules/manager.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Core.init();
+            ModuleManager.init();
+            ModuleTrainer.init();
+            CalculatorModule.init();
+            WriterModule.init();
+            KnowledgeModule.init();
+            console.log('🚀 ALVACOA prête !');
+        });
+    </script>
+</body>
+</html>
