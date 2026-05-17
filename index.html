@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALVACOA - IA Hybride</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background:radial-gradient(ellipse at center,#1a1a3e 0%,#0a0a1a 70%); height:100vh; display:flex; justify-content:center; align-items:center; }
+        .chat-container { width:100%; max-width:750px; height:92vh; background:#111827; border-radius:20px; display:flex; flex-direction:column; box-shadow:0 0 60px rgba(99,102,241,0.15); overflow:hidden; border:1px solid rgba(99,102,241,0.2); }
+        .chat-header { background:#0d1321; padding:18px 24px; display:flex; align-items:center; gap:14px; border-bottom:1px solid rgba(99,102,241,0.3); flex-wrap:wrap; }
+        .avatar { width:48px; height:48px; background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; color:white; box-shadow:0 0 20px rgba(99,102,241,0.4); }
+        .header-info h2 { color:#f1f5f9; font-size:18px; font-weight:700; }
+        .header-info p { color:#22c55e; font-size:12px; display:flex; align-items:center; gap:6px; }
+        .status-dot { width:8px; height:8px; background:#22c55e; border-radius:50%; animation:pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .header-actions { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+        .train-btn, .api-btn { color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; }
+        .train-btn { background:#6366f1; }
+        .api-btn { background:#374151; }
+        .api-btn.active { background:#059669; animation:glow 2s infinite; }
+        @keyframes glow { 0%,100%{box-shadow:0 0 5px #22c55e} 50%{box-shadow:0 0 20px #22c55e} }
+        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:18px; background:#111827; }
+        .chat-messages::-webkit-scrollbar { width:5px; }
+        .chat-messages::-webkit-scrollbar-thumb { background:#374151; border-radius:10px; }
+        .message { display:flex; gap:12px; animation:slideIn 0.35s ease; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+        .message.user { justify-content:flex-end; }
+        .message-avatar { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+        .message.assistant .message-avatar { background:linear-gradient(135deg,#6366f1,#a855f7); }
+        .message.user .message-avatar { background:#374151; order:2; }
+        .message-bubble { max-width:72%; padding:14px 18px; border-radius:18px; line-height:1.6; font-size:14.5px; word-wrap:break-word; }
+        .message.assistant .message-bubble { background:#1e293b; color:#e2e8f0; border-bottom-left-radius:6px; border:1px solid rgba(99,102,241,0.2); }
+        .message.user .message-bubble { background:linear-gradient(135deg,#6366f1,#7c3aed); color:white; border-bottom-right-radius:6px; }
+        .code-inline { font-family:'Courier New',monospace; background:rgba(0,0,0,0.4); padding:2px 8px; border-radius:6px; color:#fbbf24; }
+        .result-block { background:rgba(0,0,0,0.3); border-left:3px solid #6366f1; padding:12px 16px; border-radius:8px; margin:10px 0; font-family:'Courier New',monospace; }
+        .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:700; margin-left:8px; }
+        .badge.local { background:#6366f1; color:white; }
+        .badge.api { background:#059669; color:white; }
+        .chat-input-area { padding:16px 24px; border-top:1px solid rgba(99,102,241,0.2); background:#0d1321; display:flex; gap:12px; }
+        .chat-input { flex:1; background:#1e293b; border:1px solid #374151; border-radius:14px; padding:14px 18px; color:#e2e8f0; font-size:14.5px; outline:none; }
+        .chat-input:focus { border-color:#6366f1; }
+        .chat-input::placeholder { color:#64748b; }
+        .send-btn { background:linear-gradient(135deg,#6366f1,#7c3aed); border:none; border-radius:14px; padding:14px 22px; color:white; cursor:pointer; font-size:18px; }
+        .typing-indicator { display:flex; gap:5px; padding:10px 0; }
+        .typing-indicator span { width:8px; height:8px; background:#6366f1; border-radius:50%; animation:typing 1.4s infinite; }
+        .typing-indicator span:nth-child(2){animation-delay:0.2s}
+        .typing-indicator span:nth-child(3){animation-delay:0.4s}
+        @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.3} 30%{transform:translateY(-10px);opacity:1} }
+        .modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.8); z-index:200; align-items:center; justify-content:center; }
+        .modal.active { display:flex; }
+        .modal-content { background:#1e293b; padding:30px; border-radius:16px; width:90%; max-width:500px; color:#e2e8f0; }
+        .modal-content h3 { margin-bottom:16px; }
+        .modal-content input,.modal-content textarea,.modal-content select { width:100%; background:#0f172a; border:1px solid #374151; border-radius:8px; padding:12px; color:#e2e8f0; margin-bottom:12px; }
+        .modal-content textarea { height:120px; resize:vertical; }
+        .modal-content button { background:#6366f1; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; margin-right:10px; }
+        .modal-content button.close-btn { background:#374151; }
+        .modal-content .note { font-size:12px; color:#94a3b8; margin-bottom:12px; padding:8px; background:#0f172a; border-radius:8px; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar">A</div>
+            <div class="header-info">
+                <h2>ALVACOA</h2>
+                <p><span class="status-dot"></span> <span id="modeDisplay">Mode Local</span></p>
+            </div>
+            <div class="header-actions">
+                <button class="api-btn" id="apiToggleBtn" onclick="toggleAPIMode()">🔌 API: OFF</button>
+                <button class="train-btn" onclick="openTrainModal()">🧠 Apprendre</button>
+                <button class="train-btn" style="background:#374151;" onclick="openAPISettings()">⚙️ API</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" 
+                   placeholder="Écrivez votre message..." onkeydown="handleKeyDown(event)">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- Modal Apprentissage -->
+    <div class="modal" id="trainModal">
+        <div class="modal-content">
+            <h3>🧠 Apprendre à ALVACOA</h3>
+            <input type="text" id="trainQuestion" placeholder="Mot-clé ou question">
+            <textarea id="trainAnswer" placeholder="Réponse que ALVACOA devra donner..."></textarea>
+            <button onclick="trainAI()">✅ Enregistrer</button>
+            <button class="close-btn" onclick="closeTrainModal()">❌ Fermer</button>
+        </div>
+    </div>
+
+    <!-- Modal Configuration API -->
+    <div class="modal" id="apiModal">
+        <div class="modal-content">
+            <h3>⚙️ Configuration API</h3>
+            <div class="note">
+                💡 Votre API est déjà déployée sur :<br>
+                <strong>https://alvacoa-api.onrender.com/chat</strong>
+            </div>
+            <label>🔗 URL de votre API</label>
+            <input type="text" id="apiUrl" value="https://alvacoa-api.onrender.com/chat">
+            <button onclick="saveAPISettings()">💾 Sauvegarder</button>
+            <button class="close-btn" onclick="closeAPISettings()">❌ Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIGURATION ============
+        const API_URL = 'https://alvacoa-api.onrender.com/chat';
+        let useAPI = false;
+
+        // ============ BASE DE CONNAISSANCES ============
+        let knowledgeBase = JSON.parse(localStorage.getItem('alvacoa_knowledge')) || {
+            "bonjour": "Bonjour ! 👋 Je suis ALVACOA. Comment puis-je vous aider ?",
+            "salut": "Salut ! 😊 Ravie de vous voir.",
+            "qui es-tu": "Je suis <strong>ALVACOA</strong>, une IA hybride ! 🧠 Mode local ou Mode API.",
+            "merci": "Avec plaisir ! 🙌",
+            "aide": "📚 <strong>Aide :</strong><br>🧮 Calculs : 15+8*3<br>✍️ Rédaction : rédige un email<br>🔌 Activez l'API pour l'IA avancée !"
+        };
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+
+        // ============ FONCTIONS DE BASE ============
+        function addMessage(type, content, source = 'local') {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            const badge = type === 'assistant' ? 
+                `<span class="badge ${source}">${source === 'api' ? 'API' : 'Local'}</span>` : '';
+            div.innerHTML = `
+                <div class="message-avatar">${type === 'user' ? '👤' : 'A'}</div>
+                <div class="message-bubble">${content}${badge}</div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.id = 'typingIndicator';
+            div.innerHTML = `
+                <div class="message-avatar">A</div>
+                <div class="message-bubble">
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        function saveKnowledge() {
+            localStorage.setItem('alvacoa_knowledge', JSON.stringify(knowledgeBase));
+        }
+
+        // ============ CALCULS ============
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let r = 1;
+            for (let i = 2; i <= n; i++) r *= i;
+            return r;
+        }
+
+        function evaluateMath(expression) {
+            try {
+                let expr = expression
+                    .replace(/×/g, '*').replace(/÷/g, '/')
+                    .replace(/π/gi, Math.PI).replace(/\^/g, '**')
+                    .replace(/sin\(/gi, 'Math.sin(').replace(/cos\(/gi, 'Math.cos(')
+                    .replace(/tan\(/gi, 'Math.tan(').replace(/log\(/gi, 'Math.log10(')
+                    .replace(/ln\(/gi, 'Math.log(').replace(/sqrt\(/gi, 'Math.sqrt(')
+                    .replace(/(\d+)!/g, (_, n) => factorial(parseInt(n)))
+                    .replace(/(\d+)%/g, '($1/100)');
+                let result = Function('"use strict"; return (' + expr + ')')();
+                if (isNaN(result) || !isFinite(result)) return null;
+                return Number.isInteger(result) ? result : parseFloat(result.toFixed(10));
+            } catch (e) { return null; }
+        }
+
+        function isMathExpression(text) {
+            return /[\d]+\s*[\+\-\*\/\^]/.test(text) || 
+                   /sin|cos|tan|log|ln|sqrt|pi|π/i.test(text) ||
+                   /calcul|calcule|résous/i.test(text);
+        }
+
+        function findBestMatch(message) {
+            const msg = message.toLowerCase().trim();
+            if (knowledgeBase[msg]) return knowledgeBase[msg];
+            const userWords = msg.split(/\s+/);
+            let bestScore = 0, bestAnswer = null;
+            for (let [key, value] of Object.entries(knowledgeBase)) {
+                const keyWords = key.split(/\s+/);
+                let score = 0;
+                for (let uw of userWords)
+                    for (let kw of keyWords)
+                        if (uw.includes(kw) || kw.includes(uw)) score += 1;
+                if (score > bestScore) { bestScore = score; bestAnswer = value; }
+            }
+            return bestScore > 0.5 ? bestAnswer : null;
+        }
+
+        function getLocalResponse(message) {
+            const msg = message.toLowerCase();
+            if (isMathExpression(message)) {
+                const expr = message.replace(/calcule|calculer|résous|combien fait/gi, '').replace(/\?/g, '').trim();
+                const result = evaluateMath(expr);
+                if (result !== null) return `📊 <strong>Calcul :</strong><br><div class="result-block">${expr} = <strong>${result}</strong></div>`;
+            }
+            if (/rédige|rédiger|écris|écrire|ecris|ecrire/i.test(msg)) {
+                if (/email|mail/i.test(msg)) return `✍️ <strong>Email :</strong><br><div class="result-block">Objet : [Sujet]<br><br>Bonjour [Nom],<br><br>[Message]<br><br>Cordialement,</div>`;
+                if (/histoire/i.test(msg)) return `📖 Il était une fois une IA nommée ALVACOA...`;
+                return `✍️ Je peux rédiger : <strong>Email</strong>, <strong>Histoire</strong>. Lequel ?`;
+            }
+            const match = findBestMatch(message);
+            if (match) return match;
+            const autoLearn = message.match(/(.+?) (?:est|signifie|veut dire) (.+)/i);
+            if (autoLearn) {
+                const key = autoLearn[1].trim().toLowerCase();
+                const value = autoLearn[2].trim();
+                knowledgeBase[key] = value;
+                saveKnowledge();
+                return `🧠 <strong>J'ai appris !</strong> "${key}" → ${value}`;
+            }
+            return null;
+        }
+
+        // ============ APPEL API ============
+        async function getAPIResponse(message) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                if (data.content) return data.content;
+                return 'Réponse API reçue mais format incorrect.';
+            } catch (error) {
+                return `🔌 <strong>Erreur API :</strong> ${error.message}<br>L'API est peut-être en veille (Render gratuit). Réessayez.`;
+            }
+        }
+
+        // ============ ENVOI DE MESSAGE ============
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            addMessage('user', text);
+            chatInput.value = '';
+            showTyping();
+
+            let response, source = 'local';
+
+            if (useAPI) {
+                response = await getAPIResponse(text);
+                source = 'api';
+            } else {
+                response = getLocalResponse(text);
+                if (!response) response = "🤔 Je ne sais pas répondre. Activez l'<strong>API</strong> ou apprenez-moi !";
+            }
+
+            setTimeout(() => {
+                removeTyping();
+                addMessage('assistant', response, source);
+            }, 300);
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // ============ MODE API ============
+        function toggleAPIMode() {
+            useAPI = !useAPI;
+            const btn = document.getElementById('apiToggleBtn');
+            const modeDisplay = document.getElementById('modeDisplay');
+            
+            if (useAPI) {
+                btn.textContent = '🔌 API: ON';
+                btn.classList.add('active');
+                modeDisplay.textContent = 'Mode API (Claude)';
+                addMessage('assistant', '🔌 <strong>Mode API activé !</strong> Je suis connectée à Claude d\'Anthropic.', 'api');
+            } else {
+                btn.textContent = '🔌 API: OFF';
+                btn.classList.remove('active');
+                modeDisplay.textContent = 'Mode Local';
+                addMessage('assistant', '🏠 <strong>Mode Local.</strong> J\'utilise mes connaissances internes.', 'local');
+            }
+        }
+
+        // ============ APPRENTISSAGE ============
+        function openTrainModal() {
+            document.getElementById('trainModal').classList.add('active');
+            document.getElementById('trainQuestion').focus();
+        }
+        function closeTrainModal() {
+            document.getElementById('trainModal').classList.remove('active');
+        }
+        function trainAI() {
+            const question = document.getElementById('trainQuestion').value.trim().toLowerCase();
+            const answer = document.getElementById('trainAnswer').value.trim();
+            if (!question || !answer) return alert('Remplissez les deux champs.');
+            knowledgeBase[question] = answer;
+            saveKnowledge();
+            addMessage('assistant', `🧠 <strong>Appris !</strong> "${question}"`, 'local');
+            document.getElementById('trainQuestion').value = '';
+            document.getElementById('trainAnswer').value = '';
+            closeTrainModal();
+        }
+
+        // ============ CONFIG API ============
+        function openAPISettings() {
+            document.getElementById('apiModal').classList.add('active');
+        }
+        function closeAPISettings() {
+            document.getElementById('apiModal').classList.remove('active');
+        }
+        function saveAPISettings() {
+            addMessage('assistant', '⚙️ <strong>API configurée !</strong><br>🔗 https://alvacoa-api.onrender.com/chat<br>Activez avec le bouton 🔌', 'local');
+            closeAPISettings();
+        }
+
+        // ============ INITIALISATION ============
+        setTimeout(() => {
+            addMessage('assistant', `
+                👋 Bonjour ! Je suis <strong>ALVACOA</strong> !<br><br>
+                🏠 <strong>Mode Local</strong> : calculs, rédaction, apprentissage<br>
+                🔌 <strong>Mode API</strong> : connectée à Claude (Anthropic)<br>
+                🧠 <strong>Apprentissage</strong> : je retiens ce que vous m'apprenez<br><br>
+                <em>Cliquez sur 🔌 pour m'activer l'API !</em>
+            `, 'local');
+        }, 500);
+
+        chatInput.focus();
+    </script>
+</body>
+</html>
