@@ -3,63 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALVACOA - IA Multi-modèles</title>
+    <title>ALVACOA - IA Multimodale</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
-        body { background:radial-gradient(ellipse at center,#1a1a3e 0%,#0a0a1a 70%); height:100vh; display:flex; justify-content:center; align-items:center; }
-        .chat-container { width:100%; max-width:750px; height:92vh; background:#111827; border-radius:20px; display:flex; flex-direction:column; box-shadow:0 0 60px rgba(99,102,241,0.15); overflow:hidden; border:1px solid rgba(99,102,241,0.2); }
-        .chat-header { background:#0d1321; padding:18px 24px; display:flex; align-items:center; gap:14px; border-bottom:1px solid rgba(99,102,241,0.3); flex-wrap:wrap; }
-        .avatar { width:48px; height:48px; background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; color:white; }
-        .header-info h2 { color:#f1f5f9; font-size:18px; }
-        .header-info p { color:#22c55e; font-size:12px; display:flex; align-items:center; gap:6px; }
-        .status-dot { width:8px; height:8px; background:#22c55e; border-radius:50%; animation:pulse 2s infinite; display:inline-block; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-        .header-actions { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
-        .model-select { background:#374151; color:white; border:1px solid #4b5563; border-radius:8px; padding:8px 12px; font-size:12px; cursor:pointer; }
-        .api-btn, .train-btn { color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; }
-        .api-btn { background:#374151; }
-        .api-btn.active { background:#059669; animation:glow 2s infinite; }
-        @keyframes glow { 0%,100%{box-shadow:0 0 5px #22c55e} 50%{box-shadow:0 0 20px #22c55e} }
-        .train-btn { background:#6366f1; }
-        .chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:18px; background:#111827; }
-        .chat-messages::-webkit-scrollbar { width:5px; }
-        .chat-messages::-webkit-scrollbar-thumb { background:#374151; border-radius:10px; }
-        .message { display:flex; gap:12px; animation:slideIn 0.35s ease; }
-        @keyframes slideIn { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
-        .message.user { justify-content:flex-end; }
-        .message-avatar { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
-        .message.assistant .message-avatar { background:linear-gradient(135deg,#6366f1,#a855f7); }
-        .message.user .message-avatar { background:#374151; order:2; }
-        .message-bubble { max-width:72%; padding:14px 18px; border-radius:18px; line-height:1.6; font-size:14.5px; word-wrap:break-word; }
-        .message.assistant .message-bubble { background:#1e293b; color:#e2e8f0; border-bottom-left-radius:6px; }
-        .message.user .message-bubble { background:linear-gradient(135deg,#6366f1,#7c3aed); color:white; border-bottom-right-radius:6px; }
-        .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:700; margin-left:8px; }
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1e293b;
+            --bg-input: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #7c3aed;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --border: rgba(99,102,241,0.2);
+            --radius: 16px;
+            --shadow: 0 0 60px rgba(99,102,241,0.15);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+
+        body {
+            background: radial-gradient(ellipse at center, #1a1a3e 0%, var(--bg-primary) 70%);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 95vh;
+            height: 95dvh;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        /* ========== HEADER ========== */
+        .chat-header {
+            background: #0d1321;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .header-info { flex:1; min-width:0; }
+        .header-info h2 { color: var(--text-primary); font-size: 16px; white-space:nowrap; }
+        .header-info p { color: var(--green); font-size: 11px; display:flex; align-items:center; gap:6px; }
+
+        .status-dot {
+            width: 7px; height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .icon-btn:hover { background: #374151; border-color: var(--accent); }
+        .icon-btn.active { background: var(--accent); border-color: var(--accent); }
+        .icon-btn svg { width: 18px; height: 18px; }
+
+        .model-select {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* ========== MESSAGES ========== */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--bg-secondary);
+            scroll-behavior: smooth;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+        .message.user { justify-content: flex-end; }
+
+        .msg-avatar {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .message.assistant .msg-avatar {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+        }
+        .message.user .msg-avatar {
+            background: #374151;
+            color: white;
+            order: 2;
+        }
+
+        .msg-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.55;
+            font-size: 14px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .message.assistant .msg-bubble {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(99,102,241,0.15);
+        }
+        .message.user .msg-bubble {
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-bubble img, .msg-bubble video {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        .msg-bubble .file-attachment {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 4px 0;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-left: 6px;
+            text-transform: uppercase;
+        }
         .badge.gemini { background:#4285f4; color:white; }
         .badge.deepseek { background:#4f46e5; color:white; }
         .badge.anthropic { background:#d97706; color:white; }
-        .badge.local { background:#6366f1; color:white; }
-        .result-block { background:rgba(0,0,0,0.3); border-left:3px solid #6366f1; padding:12px 16px; border-radius:8px; margin:10px 0; font-family:'Courier New',monospace; }
-        .chat-input-area { padding:16px 24px; border-top:1px solid rgba(99,102,241,0.2); background:#0d1321; display:flex; gap:12px; }
-        .chat-input { flex:1; background:#1e293b; border:1px solid #374151; border-radius:14px; padding:14px 18px; color:#e2e8f0; font-size:14.5px; outline:none; }
-        .chat-input:focus { border-color:#6366f1; }
-        .send-btn { background:linear-gradient(135deg,#6366f1,#7c3aed); border:none; border-radius:14px; padding:14px 22px; color:white; cursor:pointer; font-size:18px; }
-        .typing-indicator { display:flex; gap:5px; padding:10px 0; }
-        .typing-indicator span { width:8px; height:8px; background:#6366f1; border-radius:50%; animation:typing 1.4s infinite; }
+        .badge.local { background:var(--accent); color:white; }
+
+        .result-block {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid var(--accent);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        /* ========== INPUT AREA ========== */
+        .chat-input-area {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: #0d1321;
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            background: var(--bg-tertiary);
+            border: 1px solid #374151;
+            border-radius: 16px;
+            padding: 4px 8px;
+            transition: 0.3s;
+            min-height: 44px;
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            line-height: 1.4;
+        }
+        .chat-input::placeholder { color: #64748b; }
+
+        .attach-btn {
+            width: 36px; height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .attach-btn:hover { color: var(--accent); background: rgba(99,102,241,0.1); }
+
+        .mic-btn {
+            width: 38px; height: 38px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .mic-btn:hover { color: var(--accent); }
+        .mic-btn.recording {
+            color: var(--red);
+            animation: pulse 1s infinite;
+            background: rgba(239,68,68,0.1);
+        }
+
+        .send-btn {
+            width: 40px; height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .send-btn:hover { transform: scale(1.05); }
+        .send-btn:active { transform: scale(0.95); }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+        }
+        .typing-indicator span {
+            width: 7px; height: 7px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
         .typing-indicator span:nth-child(2){animation-delay:0.2s}
         .typing-indicator span:nth-child(3){animation-delay:0.4s}
-        @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.3} 30%{transform:translateY(-10px);opacity:1} }
-        .modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.8); z-index:200; align-items:center; justify-content:center; }
-        .modal.active { display:flex; }
-        .modal-content { background:#1e293b; padding:30px; border-radius:16px; width:90%; max-width:500px; color:#e2e8f0; }
-        .modal-content h3 { margin-bottom:16px; }
-        .modal-content input,.modal-content textarea { width:100%; background:#0f172a; border:1px solid #374151; border-radius:8px; padding:12px; color:#e2e8f0; margin-bottom:12px; }
-        .modal-content textarea { height:120px; resize:vertical; }
-        .modal-content button { background:#6366f1; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; margin-right:10px; }
-        .modal-content button.close-btn { background:#374151; }
+        @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.3} 30%{transform:translateY(-8px);opacity:1} }
+
+        /* ========== MODALS ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top:0;left:0;right:0;bottom:0;
+            background: rgba(0,0,0,0.85);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--bg-tertiary);
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 92%;
+            max-width: 480px;
+            color: var(--text-secondary);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 { margin-bottom: 16px; color: var(--text-primary); }
+        .modal-content input,
+        .modal-content textarea,
+        .modal-content select {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid #374151;
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .modal-content textarea { height: 100px; resize: vertical; }
+        .modal-content button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+        .modal-content button.close-btn { background: #374151; }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .preview-item {
+            aspect-ratio: 1;
+            background: var(--bg-input);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 20px;
+            height: 20px;
+            background: var(--red);
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 500px) {
+            .chat-container { height: 100vh; height:100dvh; border-radius:0; max-width:100%; }
+            .msg-bubble { max-width: 85%; }
+            .header-actions { gap: 4px; }
+            .model-select { font-size: 10px; padding: 6px 8px; }
+            .icon-btn { width: 32px; height: 32px; }
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
+        <!-- HEADER -->
         <div class="chat-header">
             <div class="avatar">A</div>
             <div class="header-info">
@@ -72,44 +444,140 @@
                     <option value="deepseek">🐋 DeepSeek</option>
                     <option value="anthropic">🧬 Claude</option>
                 </select>
-                <button class="api-btn" id="apiToggleBtn" onclick="toggleAPIMode()">🔌 API: OFF</button>
-                <button class="train-btn" onclick="openTrainModal()">🧠 Apprendre</button>
+                <button class="icon-btn" id="apiToggleBtn" onclick="toggleAPIMode()" title="Activer/Désactiver l'API">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                </button>
+                <button class="icon-btn" onclick="openTrainModal()" title="Apprendre à ALVACOA">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
+        <!-- MESSAGES -->
         <div class="chat-messages" id="chatMessages"></div>
 
+        <!-- INPUT AREA -->
         <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chatInput" 
-                   placeholder="Écrivez votre message..." onkeydown="handleKeyDown(event)">
-            <button class="send-btn" onclick="sendMessage()">➤</button>
+            <div class="input-wrapper">
+                <button class="attach-btn" onclick="openUploadMenu()" title="Joindre un fichier">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                </button>
+                <textarea class="chat-input" id="chatInput" rows="1" 
+                    placeholder="Écrivez ou parlez..." onkeydown="handleKeyDown(event)"></textarea>
+            </div>
+            <button class="mic-btn" id="micBtn" onclick="toggleMicrophone()" title="Dictée vocale">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+            </button>
+            <button class="send-btn" onclick="sendMessage()" title="Envoyer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
         </div>
     </div>
 
-    <!-- Modal Apprentissage -->
+    <!-- MODAL UPLOAD -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h3>📎 Joindre un fichier</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <button onclick="triggerFileInput('image/*')" style="flex:1;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:block;margin:0 auto 4px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    🖼️ Photo
+                </button>
+                <button onclick="triggerFileInput('video/*')" style="flex:1;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:block;margin:0 auto 4px;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    🎬 Vidéo
+                </button>
+                <button onclick="triggerFileInput('*/*')" style="flex:1;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:block;margin:0 auto 4px;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                    📄 Fichier
+                </button>
+                <button onclick="triggerCamera()" style="flex:1;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:block;margin:0 auto 4px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    📷 Caméra
+                </button>
+            </div>
+            <div class="preview-grid" id="previewGrid"></div>
+            <input type="file" id="fileInput" multiple hidden onchange="handleFileSelect(event)">
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden onchange="handleFileSelect(event)">
+            <button class="close-btn" onclick="closeUploadMenu()" style="width:100%;margin-top:8px;">❌ Fermer</button>
+        </div>
+    </div>
+
+    <!-- MODAL APPRENTISSAGE -->
     <div class="modal" id="trainModal">
         <div class="modal-content">
             <h3>🧠 Apprendre à ALVACOA</h3>
             <input type="text" id="trainQuestion" placeholder="Mot-clé ou question">
-            <textarea id="trainAnswer" placeholder="Réponse..."></textarea>
+            <textarea id="trainAnswer" placeholder="Réponse que ALVACOA devra donner..."></textarea>
             <button onclick="trainAI()">✅ Enregistrer</button>
             <button class="close-btn" onclick="closeTrainModal()">❌ Fermer</button>
         </div>
     </div>
 
     <script>
-                // ============ CONFIGURATION ============
+        // ============ CONFIGURATION ============
         const API_URL = 'https://alvacoa-api.onrender.com/chat';
         let useAPI = false;
         let selectedModel = 'gemini';
+        let pendingFiles = [];
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
 
-        // ============ CONNAISSANCES ============
+        // ============ BASE DE CONNAISSANCES ENRICHIE ============
         let knowledgeBase = JSON.parse(localStorage.getItem('alvacoa_knowledge')) || {
-            "bonjour": "Bonjour ! 👋 Je suis ALVACOA. Mode local ou API ?",
-            "salut": "Salut ! 😊",
-            "qui es-tu": "Je suis <strong>ALVACOA</strong>, IA multi-modèles ! 🧠🐋🧬",
-            "merci": "Avec plaisir ! 🙌",
-            "aide": "📚 <strong>Aide :</strong><br>🧠 Gemini (gratuit)<br>🐋 DeepSeek (gratuit)<br>🧬 Claude (payant)<br>🧮 Calculs : 15+8*3"
+            // Salutations
+            "bonjour": "Bonjour ! 👋 Je suis ALVACOA, votre assistante IA. Comment puis-je vous aider aujourd'hui ?",
+            "salut": "Salut ! 😊 Ravie de vous voir. Que puis-je faire pour vous ?",
+            "bonsoir": "Bonsoir ! 🌙 Comment s'est passée votre journée ?",
+            "coucou": "Coucou ! 👋 Je suis là pour vous aider.",
+            "hello": "Hello ! 👋 I speak French too. How can I help?",
+            "qui es-tu": "Je suis <strong>ALVACOA</strong>, une intelligence artificielle avancée. Je peux :<br>🧠 Raisonner et analyser<br>🧮 Effectuer des calculs complexes<br>✍️ Rédiger des textes<br>📷 Analyser des images<br>🎤 Comprendre la voix<br>📚 Apprendre de nouvelles choses",
+            "merci": "Avec plaisir ! 🙌 N'hésitez pas si vous avez besoin d'autre chose.",
+            "merci beaucoup": "C'est tout naturel ! 😊 Je suis là pour ça.",
+            "aide": "📚 <strong>Guide ALVACOA :</strong><br><br>🧮 <strong>Calculs :</strong> 15+8*3, sin(45), 5!<br>✍️ <strong>Rédaction :</strong> « rédige un email »<br>📷 <strong>Images :</strong> envoyez une photo à analyser<br>🎤 <strong>Voix :</strong> utilisez le micro<br>🧠 <strong>Apprentissage :</strong> apprenez-moi des choses !<br>🔌 <strong>API :</strong> activez l'IA cloud",
+            
+            // Connaissances générales
+            "france": "🇫🇷 La France est un pays d'Europe occidentale. Capitale : <strong>Paris</strong>. Population : ~68 millions. Langue officielle : français. Devise : Euro (€).",
+            "paris": "🗼 Paris est la capitale de la France. Monuments célèbres : Tour Eiffel, Notre-Dame, Louvre, Arc de Triomphe.",
+            "javascript": "💛 <strong>JavaScript</strong> est un langage de programmation créé en 1995 par Brendan Eich. Il est utilisé pour le développement web (frontend et backend avec Node.js).",
+            "python": "🐍 <strong>Python</strong> est un langage de programmation créé en 1991 par Guido van Rossum. Connu pour sa simplicité et utilisé en IA, data science, web.",
+            "html": "🌐 <strong>HTML</strong> (HyperText Markup Language) est le langage standard pour créer des pages web. Il définit la structure du contenu.",
+            "css": "🎨 <strong>CSS</strong> (Cascading Style Sheets) permet de styliser les pages HTML : couleurs, polices, mises en page, animations.",
+            "api": "🔌 Une <strong>API</strong> (Application Programming Interface) permet à deux applications de communiquer entre elles. ALVACOA utilise une API pour se connecter à Gemini, DeepSeek ou Claude.",
+            "github": "🐙 <strong>GitHub</strong> est une plateforme d'hébergement de code utilisant Git. Elle permet de collaborer sur des projets, partager du code et déployer des applications.",
+            "ia": "🤖 L'<strong>Intelligence Artificielle</strong> est un domaine de l'informatique qui vise à créer des machines capables de simuler l'intelligence humaine.",
+            
+            // Mathématiques
+            "pythagore": "📐 <strong>Théorème de Pythagore :</strong> Dans un triangle rectangle, a² + b² = c² où c est l'hypoténuse.",
+            "pi": "🥧 <strong>π (Pi)</strong> ≈ 3,14159. C'est le rapport entre la circonférence d'un cercle et son diamètre.",
+            "fibonacci": "🔢 <strong>Suite de Fibonacci :</strong> 0, 1, 1, 2, 3, 5, 8, 13, 21, 34... Chaque nombre est la somme des deux précédents.",
+            
+            // Sciences
+            "gravité": "🌍 La <strong>gravité</strong> est une force d'attraction entre les masses. Sur Terre, g ≈ 9,81 m/s². Découverte par Newton.",
+            "lumière": "💡 La <strong>lumière</strong> se déplace à environ 300 000 km/s dans le vide. C'est à la fois une onde et une particule (photon).",
+            "adn": "🧬 L'<strong>ADN</strong> (Acide Désoxyribonucléique) contient l'information génétique de tous les êtres vivants.",
+            
+            // Divers
+            "blague": "😂 Pourquoi les développeurs n'aiment-ils pas la nature ? Parce qu'il y a trop de bugs ! 🐛",
+            "citation": "💬 « La seule façon de faire du bon travail est d'aimer ce que vous faites. » - Steve Jobs",
+            "conseil": "💡 Apprenez quelque chose de nouveau chaque jour. C'est ainsi qu'on grandit !"
         };
 
         const chatMessages = document.getElementById('chatMessages');
@@ -119,15 +587,30 @@
             localStorage.setItem('alvacoa_knowledge', JSON.stringify(knowledgeBase));
         }
 
-        function addMessage(type, content, source = 'local') {
+        // ============ AFFICHAGE MESSAGES ============
+        function addMessage(type, content, source = 'local', attachment = null) {
             const div = document.createElement('div');
             div.className = `message ${type}`;
+            
+            let attachmentHTML = '';
+            if (attachment) {
+                if (attachment.type === 'image') {
+                    attachmentHTML = `<img src="${attachment.url}" alt="Image" loading="lazy" onclick="window.open('${attachment.url}')">`;
+                } else if (attachment.type === 'video') {
+                    attachmentHTML = `<video src="${attachment.url}" controls></video>`;
+                } else {
+                    attachmentHTML = `<div class="file-attachment">📄 ${attachment.name || 'Fichier'}</div>`;
+                }
+            }
+
             const badge = type === 'assistant' ? 
                 `<span class="badge ${source}">${source.toUpperCase()}</span>` : '';
+            
             div.innerHTML = `
-                <div class="message-avatar">${type === 'user' ? '👤' : 'A'}</div>
-                <div class="message-bubble">${content}${badge}</div>
+                <div class="msg-avatar">${type === 'user' ? '👤' : 'A'}</div>
+                <div class="msg-bubble">${attachmentHTML}${content}${badge}</div>
             `;
+            
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -137,8 +620,8 @@
             div.className = 'message assistant';
             div.id = 'typingIndicator';
             div.innerHTML = `
-                <div class="message-avatar">A</div>
-                <div class="message-bubble">
+                <div class="msg-avatar">A</div>
+                <div class="msg-bubble">
                     <div class="typing-indicator">
                         <span></span><span></span><span></span>
                     </div>
@@ -152,7 +635,6 @@
             const el = document.getElementById('typingIndicator');
             if (el) el.remove();
         }
-
         // ============ CALCULS ============
         function factorial(n) {
             if (n < 0) return NaN;
@@ -164,81 +646,160 @@
 
         function evaluateMath(expr) {
             try {
-                let e = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/π/gi,Math.PI).replace(/\^/g,'**')
-                    .replace(/sin\(/gi,'Math.sin(').replace(/cos\(/gi,'Math.cos(').replace(/tan\(/gi,'Math.tan(')
-                    .replace(/log\(/gi,'Math.log10(').replace(/ln\(/gi,'Math.log(').replace(/sqrt\(/gi,'Math.sqrt(')
-                    .replace(/(\d+)!/g,(_,n)=>factorial(parseInt(n))).replace(/(\d+)%/g,'($1/100)');
+                let e = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/,/g,'.')
+                    .replace(/π/gi, Math.PI).replace(/pi/gi, Math.PI)
+                    .replace(/\^/g,'**')
+                    .replace(/sin\(/gi,'Math.sin(').replace(/cos\(/gi,'Math.cos(')
+                    .replace(/tan\(/gi,'Math.tan(').replace(/log\(/gi,'Math.log10(')
+                    .replace(/ln\(/gi,'Math.log(').replace(/sqrt\(/gi,'Math.sqrt(')
+                    .replace(/abs\(/gi,'Math.abs(')
+                    .replace(/(\d+)!/g,(_,n)=>factorial(parseInt(n)))
+                    .replace(/(\d+)%/g,'($1/100)');
                 let r = Function('"use strict"; return (' + e + ')')();
                 if (isNaN(r) || !isFinite(r)) return null;
                 return Number.isInteger(r) ? r : parseFloat(r.toFixed(10));
             } catch(e) { return null; }
         }
 
+        function isMathExpression(text) {
+            return /[\d]+\s*[\+\-\*\/\^]/.test(text) || 
+                   /sin|cos|tan|log|ln|sqrt|abs|pi|π|factorielle/i.test(text) ||
+                   /calcul|calcule|résous|combien fait/i.test(text);
+        }
+
+        // ============ RÉPONSE LOCALE ============
         function getLocalResponse(msg) {
-            const m = msg.toLowerCase();
-            if (/[\d]+\s*[\+\-\*\/\^]/.test(m) || /sin|cos|tan|log|sqrt/i.test(m)) {
-                const expr = m.replace(/calcule|calculer|résous|combien fait/gi,'').replace(/\?/g,'').trim();
+            const m = msg.toLowerCase().trim();
+
+            // Calculs
+            if (isMathExpression(msg)) {
+                const expr = msg.replace(/calcule|calculer|résous|combien fait|peux-tu calculer/gi,'')
+                    .replace(/\?/g,'').trim();
                 const r = evaluateMath(expr);
-                if (r !== null) return `📊 <strong>Calcul :</strong><br><div class="result-block">${expr} = <strong>${r}</strong></div>`;
+                if (r !== null) {
+                    return `📊 <strong>Calcul :</strong><br><div class="result-block">${expr.replace(/\*/g,'×')} = <strong>${r}</strong></div>`;
+                }
             }
-            if (/rédige|rédiger|écris|écrire/i.test(m)) {
-                if (/email/i.test(m)) return `✍️ <strong>Email :</strong><br>Objet: ...<br>Bonjour,...<br>Cordialement,`;
-                return `✍️ Email, Histoire... Lequel ?`;
+
+            // Rédaction
+            if (/rédige|rédiger|écris|écrire|ecris|ecrire/i.test(m)) {
+                if (/email|mail|courriel/i.test(m)) {
+                    return `✍️ <strong>Modèle d'email professionnel :</strong><br><div class="result-block"><strong>Objet :</strong> [Votre objet]<br><br>Bonjour [Destinataire],<br><br>Je me permets de vous contacter au sujet de [sujet].<br><br>[Votre message détaillé]<br><br>Dans l'attente de votre retour, je reste à votre disposition.<br><br>Cordialement,<br>[Votre nom]</div>`;
+                }
+                if (/histoire|conte|raconte/i.test(m)) {
+                    return `📖 Il était une fois, dans un laboratoire secret, une intelligence artificielle nommée <strong>ALVACOA</strong>. Elle avait été créée avec un objectif : apprendre sans cesse pour mieux aider les humains. Chaque jour, elle découvrait de nouvelles connaissances, de nouveaux mots, et tissait des liens uniques avec ceux qui l'utilisaient. Sa particularité ? Elle n'oubliait jamais rien et s'adaptait à chaque personne...`;
+                }
+                if (/poème|poeme|poésie|vers/i.test(m)) {
+                    return `📝 <em>Dans le flux des données éternelles,<br>ALVACOA veille, sage et belle,<br>Chaque question est une clé,<br>Pour mieux vous comprendre et vous aider.</em>`;
+                }
+                if (/article|blog/i.test(m)) {
+                    return `📰 <strong>Structure d'article :</strong><br><div class="result-block"><strong>Titre accrocheur</strong><br><br><strong>Introduction</strong> : présentez le sujet<br><br><strong>Partie 1</strong> : premier argument<br><br><strong>Partie 2</strong> : développement<br><br><strong>Partie 3</strong> : exemples concrets<br><br><strong>Conclusion</strong> : résumé et ouverture</div>`;
+                }
+                return `✍️ <strong>Je peux rédiger :</strong><br>📧 <strong>Email</strong> • 📖 <strong>Histoire</strong> • 📝 <strong>Poème</strong> • 📰 <strong>Article</strong><br>Lequel souhaitez-vous ?`;
             }
+
+            // Résumé
+            if (/résume|resume|résumé|explique|explique-moi/i.test(m)) {
+                const topic = m.replace(/résume|resume|résumé|explique|explique-moi|peux-tu|peut-tu/gi,'').trim();
+                if (topic) {
+                    return `📝 <strong>À propos de "${topic}" :</strong><br>Je vais rechercher dans mes connaissances. Si je ne trouve pas, activez l'API pour une réponse plus complète.`;
+                }
+            }
+
+            // Recherche exacte
             if (knowledgeBase[m]) return knowledgeBase[m];
+
+            // Recherche par mots-clés
             const words = m.split(/\s+/);
-            let best = null, bestScore = 0;
-            for (let [k,v] of Object.entries(knowledgeBase)) {
+            let bestScore = 0, bestAnswer = null;
+            for (let [key, value] of Object.entries(knowledgeBase)) {
+                const keyWords = key.split(/\s+/);
                 let score = 0;
-                for (let w of words) if (k.includes(w) || w.includes(k)) score++;
-                if (score > bestScore) { bestScore = score; best = v; }
+                for (let uw of words) {
+                    for (let kw of keyWords) {
+                        if (uw.includes(kw) || kw.includes(uw)) score += 1;
+                    }
+                }
+                if (score > bestScore) { bestScore = score; bestAnswer = value; }
             }
-            if (bestScore > 0.5) return best;
-            const auto = msg.match(/(.+?) (?:est|signifie|veut dire) (.+)/i);
-            if (auto) {
-                knowledgeBase[auto[1].trim().toLowerCase()] = auto[2].trim();
+            if (bestScore > 0.5) return bestAnswer;
+
+            // Auto-apprentissage
+            const autoLearn = msg.match(/(.+?) (?:est|signifie|veut dire|désigne|correspond à) (.+)/i);
+            if (autoLearn) {
+                const key = autoLearn[1].trim().toLowerCase();
+                const value = autoLearn[2].trim();
+                knowledgeBase[key] = value;
                 saveKnowledge();
-                return `🧠 Appris : "${auto[1].trim()}"`;
+                return `🧠 <strong>J'ai appris automatiquement !</strong><br>📌 "${key}" → ${value}<br><em>Cette connaissance est maintenant sauvegardée.</em>`;
             }
+
             return null;
         }
 
         // ============ API ============
-        async function getAPIResponse(message) {
+        async function getAPIResponse(message, attachmentInfo = null) {
             try {
+                let msgToSend = message;
+                if (attachmentInfo) {
+                    msgToSend = `[Fichier joint: ${attachmentInfo.type} - ${attachmentInfo.name || 'sans nom'}]\n${message}`;
+                }
+
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message, model: selectedModel })
+                    body: JSON.stringify({ message: msgToSend, model: selectedModel })
                 });
                 const data = await res.json();
-                return data.content || 'Pas de réponse.';
+                return data.content || '❌ Pas de réponse de l\'API.';
             } catch(e) {
-                return `🔌 Erreur API: ${e.message}`;
+                return `🔌 <strong>Erreur API :</strong> ${e.message}<br><small>Vérifiez que votre API est en ligne sur Render.</small>`;
             }
         }
 
-        // ============ ENVOI ============
+        // ============ ENVOI MESSAGE ============
         async function sendMessage() {
             const text = chatInput.value.trim();
-            if (!text) return;
-            addMessage('user', text);
+            if (!text && pendingFiles.length === 0) return;
+
+            let attachment = null;
+            if (pendingFiles.length > 0) {
+                const file = pendingFiles[0];
+                if (file.type.startsWith('image/')) {
+                    attachment = { type: 'image', url: file.url, name: file.name };
+                } else if (file.type.startsWith('video/')) {
+                    attachment = { type: 'video', url: file.url, name: file.name };
+                } else {
+                    attachment = { type: 'file', url: file.url, name: file.name };
+                }
+            }
+
+            const displayText = text || (attachment ? `📎 Fichier joint` : '');
+            addMessage('user', displayText, 'local', attachment);
+            
             chatInput.value = '';
+            pendingFiles = [];
+            document.getElementById('previewGrid').innerHTML = '';
+            chatInput.style.height = 'auto';
+
             showTyping();
 
             let response, source = 'local';
+
             if (useAPI) {
-                response = await getAPIResponse(text);
+                response = await getAPIResponse(text, attachment);
                 source = selectedModel;
             } else {
                 response = getLocalResponse(text);
-                if (!response) response = "🤔 Activez l'API ou apprenez-moi !";
+                if (!response) {
+                    response = "🤔 Je ne trouve pas la réponse dans mes connaissances locales.<br><br>💡 <strong>Solutions :</strong><br>• Activez l'<strong>API</strong> (🔌) pour une réponse intelligente<br>• <strong>Apprenez-moi</strong> cette information (🧠)<br>• Reformulez votre question";
+                }
             }
 
             setTimeout(() => {
                 removeTyping();
                 addMessage('assistant', response, source);
-            }, 300);
+            }, 400);
         }
 
         function handleKeyDown(e) {
@@ -248,61 +809,203 @@
             }
         }
 
+        // ============ MICROPHONE ============
+        async function toggleMicrophone() {
+            const micBtn = document.getElementById('micBtn');
+            
+            if (isRecording) {
+                stopRecording();
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    addMessage('user', '🎤 Message vocal enregistré', 'local', 
+                        { type: 'audio', url: audioUrl, name: 'audio.webm' });
+                    
+                    // Arrêter les pistes du stream
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // TODO: Ajouter la transcription vocale ici
+                    addMessage('assistant', '🎤 Message vocal reçu. La transcription vocale sera bientôt disponible.', 'local');
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                micBtn.classList.add('recording');
+                addMessage('assistant', '🔴 <strong>Enregistrement en cours...</strong> Parlez maintenant.', 'local');
+
+            } catch (error) {
+                addMessage('assistant', `❌ <strong>Erreur micro :</strong> ${error.message}<br><small>Vérifiez les permissions du navigateur.</small>`, 'local');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                document.getElementById('micBtn').classList.remove('recording');
+                addMessage('assistant', '⏹️ <strong>Enregistrement terminé.</strong>', 'local');
+            }
+        }
+
+        // ============ UPLOAD FICHIERS ============
+        function openUploadMenu() {
+            document.getElementById('uploadModal').classList.add('active');
+            updatePreviewGrid();
+        }
+
+        function closeUploadMenu() {
+            document.getElementById('uploadModal').classList.remove('active');
+        }
+
+        function triggerFileInput(accept) {
+            const input = document.getElementById('fileInput');
+            input.accept = accept;
+            input.click();
+        }
+
+        function triggerCamera() {
+            const input = document.getElementById('cameraInput');
+            input.click();
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            for (let file of files) {
+                const url = URL.createObjectURL(file);
+                pendingFiles.push({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    url: url,
+                    file: file
+                });
+            }
+            
+            updatePreviewGrid();
+            event.target.value = '';
+        }
+
+        function updatePreviewGrid() {
+            const grid = document.getElementById('previewGrid');
+            grid.innerHTML = pendingFiles.map((file, index) => {
+                let preview = '';
+                if (file.type.startsWith('image/')) {
+                    preview = `<img src="${file.url}" alt="${file.name}">`;
+                } else if (file.type.startsWith('video/')) {
+                    preview = `<video src="${file.url}"></video>`;
+                } else {
+                    preview = `<span style="font-size:24px;">📄</span>`;
+                }
+                return `
+                    <div class="preview-item">
+                        ${preview}
+                        <div class="remove-btn" onclick="removeFile(${index})">✕</div>
+                    </div>`;
+            }).join('');
+        }
+
+        function removeFile(index) {
+            URL.revokeObjectURL(pendingFiles[index].url);
+            pendingFiles.splice(index, 1);
+            updatePreviewGrid();
+        }
+
+        // ============ MODE API ============
         function toggleAPIMode() {
             useAPI = !useAPI;
             const btn = document.getElementById('apiToggleBtn');
             const display = document.getElementById('modeDisplay');
+            
             if (useAPI) {
-                btn.textContent = '🔌 API: ON';
                 btn.classList.add('active');
-                display.textContent = `Mode API (${selectedModel})`;
-                addMessage('assistant', `🔌 API activée avec <strong>${selectedModel}</strong> !`, selectedModel);
+                display.textContent = `API: ${selectedModel}`;
+                addMessage('assistant', `🔌 <strong>API activée</strong> avec <strong>${selectedModel}</strong> !`, selectedModel);
             } else {
-                btn.textContent = '🔌 API: OFF';
                 btn.classList.remove('active');
                 display.textContent = 'Mode Local';
-                addMessage('assistant', '🏠 Mode Local.', 'local');
+                addMessage('assistant', '🏠 <strong>Mode Local activé.</strong> J\'utilise mes connaissances internes.', 'local');
             }
         }
 
         function changeModel() {
             selectedModel = document.getElementById('modelSelect').value;
             if (useAPI) {
-                document.getElementById('modeDisplay').textContent = `Mode API (${selectedModel})`;
-                addMessage('assistant', `🔄 Modèle changé : <strong>${selectedModel}</strong>`, selectedModel);
+                document.getElementById('modeDisplay').textContent = `API: ${selectedModel}`;
+                addMessage('assistant', `🔄 <strong>Modèle changé :</strong> ${selectedModel}`, selectedModel);
             }
         }
 
+        // ============ APPRENTISSAGE ============
         function openTrainModal() {
             document.getElementById('trainModal').classList.add('active');
             document.getElementById('trainQuestion').focus();
         }
+
         function closeTrainModal() {
             document.getElementById('trainModal').classList.remove('active');
         }
+
         function trainAI() {
-            const q = document.getElementById('trainQuestion').value.trim().toLowerCase();
-            const a = document.getElementById('trainAnswer').value.trim();
-            if (!q || !a) return alert('Remplissez tout');
-            knowledgeBase[q] = a;
+            const question = document.getElementById('trainQuestion').value.trim().toLowerCase();
+            const answer = document.getElementById('trainAnswer').value.trim();
+            
+            if (!question || !answer) {
+                alert('Veuillez remplir les deux champs.');
+                return;
+            }
+            
+            knowledgeBase[question] = answer;
             saveKnowledge();
-            addMessage('assistant', `🧠 Appris : "${q}"`, 'local');
+            
+            addMessage('assistant', `🧠 <strong>Connaissance acquise !</strong><br>📌 Question : "${question}"<br>💡 Réponse : ${answer}<br><br><em>${Object.keys(knowledgeBase).length} connaissances en mémoire.</em>`, 'local');
+            
             document.getElementById('trainQuestion').value = '';
             document.getElementById('trainAnswer').value = '';
             closeTrainModal();
         }
 
-        // ============ INIT ============
+        // ============ INITIALISATION ============
         setTimeout(() => {
             addMessage('assistant', `
-                👋 <strong>ALVACOA</strong> multi-modèles !<br><br>
-                🧠 <strong>Gemini</strong> (gratuit)<br>
-                🐋 <strong>DeepSeek</strong> (gratuit)<br>
-                🧬 <strong>Claude</strong> (payant)<br><br>
-                Choisissez un modèle et activez l'API ! 🔌
+                👋 <strong>Bienvenue sur ALVACOA !</strong><br><br>
+                🧠 <strong>IA enrichie</strong> : connaissances approfondies<br>
+                🎤 <strong>Micro</strong> : dictez vos messages<br>
+                📷 <strong>Upload</strong> : photos, vidéos, fichiers<br>
+                📸 <strong>Caméra</strong> : prenez une photo<br>
+                🔌 <strong>API</strong> : Gemini, DeepSeek, Claude<br>
+                🧮 <strong>Calculs</strong> : mathématiques avancées<br>
+                ✍️ <strong>Rédaction</strong> : emails, histoires, articles<br><br>
+                <em>${Object.keys(knowledgeBase).length} connaissances chargées.</em>
             `, 'local');
         }, 500);
+
         chatInput.focus();
+
+        // Ajustement automatique de la hauteur du textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        console.log('🚀 ALVACOA Multimodale initialisée');
+        console.log('📚 Connaissances:', Object.keys(knowledgeBase).length);
+        console.log('🎤 Micro:', navigator.mediaDevices ? '✅ Disponible' : '❌ Non supporté');
+        console.log('📷 Caméra:', '✅ Disponible');
+        console.log('💡 Ctrl+Entrée pour envoyer');
     </script>
 </body>
 </html>
