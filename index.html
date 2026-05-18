@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ALVACOA - IA Multimodale</title>
+    <title>ALVACOA - Messagerie & IA</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- ========== MENU LATÉRAL ========== -->
+    <!-- ========== SIDEBAR ========== -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-avatar">A</div>
             <div class="sidebar-title">
                 <h3>ALVACOA</h3>
-                <p>v3.0 Multimodale</p>
+                <p>v3.0 • Messagerie + IA</p>
             </div>
             <button class="sidebar-close" onclick="toggleSidebar()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -36,9 +36,16 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Exporter données</span>
             </button>
+            <hr style="border-color:var(--border);margin:8px 0;">
+            <div style="padding:8px 16px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Contacts Linkchat!</div>
+            <div id="sidebarContacts"></div>
+            <button class="nav-item" onclick="addContact()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                <span>Ajouter contact</span>
+            </button>
         </nav>
         <div class="sidebar-footer">
-            <p>© 2024 David Laurens Kokoura</p>
+            <p>© 2024 David Laurens Kokoura • DAVIESLAY</p>
         </div>
     </div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -53,28 +60,44 @@
                     <line x1="3" y1="12" x2="15" y2="12"/>
                 </svg>
             </button>
-            <div class="avatar">A</div>
+            <div class="avatar" id="headerAvatar">A</div>
             <div class="header-info">
-                <h2>ALVACOA</h2>
-                <p><span class="status-dot"></span> <span id="modeDisplay">Mode Local</span></p>
+                <h2 id="headerTitle">ALVACOA</h2>
+                <p><span class="status-dot"></span> <span id="headerStatus">Assistant IA</span></p>
             </div>
-            <div class="header-actions">
+            <div class="header-actions" id="headerActions">
                 <select class="model-select" id="modelSelect" onchange="changeModel()">
                     <option value="gemini">Gemini</option>
                     <option value="deepseek">DeepSeek</option>
                     <option value="anthropic">Claude</option>
                 </select>
-                <button class="icon-btn" id="apiToggleBtn" onclick="toggleAPIMode()" title="Activer/Désactiver l'API">
+                <button class="icon-btn" id="apiToggleBtn" onclick="toggleAPIMode()" title="API">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                 </button>
                 <button class="icon-btn" onclick="openTrainModal()" title="Apprendre">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </button>
+                <button class="icon-btn" id="callBtn" onclick="initiateCall()" title="Appel" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </button>
             </div>
         </div>
 
         <!-- MESSAGES -->
-        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-avatar">A</div>
+                <h3>ALVACOA</h3>
+                <p>Messagerie instantanée & Assistant IA</p>
+                <div class="welcome-actions">
+                    <button onclick="switchTab('alvacoa')">Assistant IA</button>
+                    <button onclick="switchTab('linkchat')">Linkchat!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INDICATEUR DE FRAPPE LINKCHAT -->
+        <div class="typing-status" id="typingStatus"></div>
 
         <!-- INPUT AREA -->
         <div class="chat-input-area">
@@ -83,8 +106,7 @@
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                 </button>
                 <textarea class="chat-input" id="chatInput" rows="1" 
-                    placeholder="Message ou dictée vocale..." onkeydown="handleKeyDown(event)"></textarea>
-                <!-- Barres d'ondes sonores -->
+                    placeholder="Message..." onkeydown="handleKeyDown(event)"></textarea>
                 <div class="audio-bars" id="audioBars">
                     <span></span><span></span><span></span><span></span><span></span>
                 </div>
@@ -96,40 +118,34 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
         </div>
+
+        <!-- FOOTER PILL FLOTTANT -->
+        <div class="footer-pill">
+            <button class="pill-tab active" id="pillAlvacoa" onclick="switchTab('alvacoa')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>ALVACOA</span>
+            </button>
+            <button class="pill-tab" id="pillLinkchat" onclick="switchTab('linkchat')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span>Linkchat!</span>
+            </button>
+        </div>
     </div>
 
     <!-- ========== MODALS ========== -->
     <!-- Upload -->
     <div class="modal" id="uploadModal">
         <div class="modal-content">
-            <h3>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                Joindre un fichier
-            </h3>
+            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Joindre</h3>
             <div class="upload-options">
-                <button onclick="triggerFileInput('image/*')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    <span>Photo</span>
-                </button>
-                <button onclick="triggerFileInput('video/*')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                    <span>Vidéo</span>
-                </button>
-                <button onclick="triggerFileInput('*/*')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-                    <span>Fichier</span>
-                </button>
-                <button onclick="triggerCamera()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    <span>Caméra</span>
-                </button>
+                <button onclick="triggerFileInput('image/*')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Photo</span></button>
+                <button onclick="triggerFileInput('video/*')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span>Vidéo</span></button>
+                <button onclick="triggerFileInput('*/*')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span>Fichier</span></button>
+                <button onclick="triggerCamera()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Caméra</span></button>
             </div>
             <div class="preview-grid" id="previewGrid"></div>
             <div class="modal-actions">
-                <button class="btn-primary" onclick="confirmUpload()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    OK, Publier
-                </button>
+                <button class="btn-primary" onclick="confirmUpload()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>OK, Publier</button>
                 <button class="btn-secondary" onclick="closeUploadMenu()">Fermer</button>
             </div>
             <input type="file" id="fileInput" multiple hidden onchange="handleFileSelect(event)">
@@ -140,10 +156,7 @@
     <!-- Apprentissage -->
     <div class="modal" id="trainModal">
         <div class="modal-content">
-            <h3>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                Apprendre à ALVACOA
-            </h3>
+            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Apprendre</h3>
             <input type="text" id="trainQuestion" placeholder="Mot-clé ou question">
             <textarea id="trainAnswer" placeholder="Réponse..."></textarea>
             <div class="modal-actions">
@@ -156,49 +169,21 @@
     <!-- Paramètres -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <h3>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                Paramètres
-            </h3>
-            <div class="settings-group">
-                <h4>Apparence</h4>
-                <div class="setting-row">
-                    <span>Thème</span>
-                    <select id="themeSelect" onchange="changeTheme()">
-                        <option value="dark">Sombre</option>
-                        <option value="light">Clair</option>
-                    </select>
-                </div>
-                <div class="setting-row">
-                    <span>Taille du texte</span>
-                    <select id="fontSizeSelect" onchange="changeFontSize()">
-                        <option value="small">Petit</option>
-                        <option value="medium" selected>Moyen</option>
-                        <option value="large">Grand</option>
-                    </select>
-                </div>
+            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Paramètres</h3>
+            <div class="settings-group"><h4>Apparence</h4>
+                <div class="setting-row"><span>Thème</span><select id="themeSelect" onchange="changeTheme()"><option value="dark">Sombre</option><option value="light">Clair</option></select></div>
+                <div class="setting-row"><span>Texte</span><select id="fontSizeSelect" onchange="changeFontSize()"><option value="small">Petit</option><option value="medium" selected>Moyen</option><option value="large">Grand</option></select></div>
             </div>
-            <div class="settings-group">
-                <h4>API</h4>
-                <div class="setting-row">
-                    <span>URL API</span>
-                    <input type="text" id="apiUrlSetting" value="https://alvacoa-api.onrender.com/chat">
-                </div>
-                <div class="setting-row">
-                    <span>Modèle par défaut</span>
-                    <select id="defaultModelSelect">
-                        <option value="gemini">Gemini</option>
-                        <option value="deepseek">DeepSeek</option>
-                        <option value="anthropic">Claude</option>
-                    </select>
-                </div>
+            <div class="settings-group"><h4>API</h4>
+                <div class="setting-row"><span>URL</span><input type="text" id="apiUrlSetting"></div>
+                <div class="setting-row"><span>Modèle</span><select id="defaultModelSelect"><option value="gemini">Gemini</option><option value="deepseek">DeepSeek</option><option value="anthropic">Claude</option></select></div>
             </div>
-            <div class="settings-group">
-                <h4>Données</h4>
-                <div class="setting-row">
-                    <span>Connaissances</span>
-                    <span id="knowledgeCount">0</span>
-                </div>
+            <div class="settings-group"><h4>Linkchat!</h4>
+                <div class="setting-row"><span>Votre pseudo</span><input type="text" id="usernameSetting" placeholder="Votre nom"></div>
+                <div class="setting-row"><span>ID de salon</span><input type="text" id="roomIdSetting" placeholder="ex: alvacoa-room-123"></div>
+            </div>
+            <div class="settings-group"><h4>Données</h4>
+                <div class="setting-row"><span>Connaissances</span><span id="knowledgeCount">0</span></div>
                 <button class="btn-danger" onclick="clearAllData()">Effacer toutes les données</button>
             </div>
             <div class="modal-actions">
@@ -211,42 +196,45 @@
     <!-- Historique -->
     <div class="modal" id="historyModal">
         <div class="modal-content">
-            <h3>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Historique des conversations
-            </h3>
+            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Historique</h3>
             <div class="history-list" id="historyList"></div>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeHistory()">Fermer</button>
-            </div>
+            <div class="modal-actions"><button class="btn-secondary" onclick="closeHistory()">Fermer</button></div>
         </div>
     </div>
 
     <!-- À propos -->
     <div class="modal" id="aboutModal">
         <div class="modal-content about-content">
-            <div class="about-header">
-                <div class="about-avatar">A</div>
-                <h3>ALVACOA v3.0</h3>
-            </div>
-            <p>Assistant IA multimodal développé avec passion.</p>
+            <div class="about-header"><div class="about-avatar">A</div><h3>ALVACOA v3.0</h3></div>
+            <p>Messagerie instantanée & Assistant IA</p>
             <div class="about-info">
                 <p><strong>Créateur :</strong> David Laurens Kokoura</p>
                 <p><strong>Alias :</strong> DAVIESLAY</p>
                 <p><strong>Localisation :</strong> Abidjan, Côte d'Ivoire</p>
-                <p><strong>Technologies :</strong> HTML5, CSS3, JavaScript ES6+</p>
-                <p><strong>API supportées :</strong> Gemini, DeepSeek, Anthropic</p>
-                <p><strong>Fonctionnalités :</strong> Calculs, Rédaction, Voix, Upload, Apprentissage</p>
+                <p><strong>Technologies :</strong> HTML5, CSS3, JS, WebRTC</p>
+                <p><strong>API :</strong> Gemini, DeepSeek, Anthropic</p>
             </div>
+            <div class="modal-actions"><button class="btn-secondary" onclick="closeAbout()">Fermer</button></div>
+        </div>
+    </div>
+
+    <!-- Ajouter contact -->
+    <div class="modal" id="addContactModal">
+        <div class="modal-content">
+            <h3>Ajouter un contact</h3>
+            <input type="text" id="contactName" placeholder="Nom du contact">
+            <input type="text" id="contactId" placeholder="ID unique du contact">
             <div class="modal-actions">
-                <button class="btn-secondary" onclick="closeAbout()">Fermer</button>
+                <button class="btn-primary" onclick="saveContact()">Ajouter</button>
+                <button class="btn-secondary" onclick="closeAddContact()">Fermer</button>
             </div>
         </div>
     </div>
 
     <!-- SCRIPTS -->
     <script src="modules.js"></script>
+    <script src="linkchat.js"></script>
     <script src="ui.js"></script>
     <script src="app.js"></script>
 </body>
-                              </html>
+                                                        </html>
