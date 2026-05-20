@@ -1,42 +1,18 @@
 let knowledgeBase = JSON.parse(localStorage.getItem('alvacoa_knowledge')) || {
-    "bonjour": "Bonjour ! Je suis ALVACOA, PWA installable !",
+    "bonjour": "Bonjour ! Je suis ALVACOA v4.0 avec API Developer Portal !",
     "salut": "Salut ! Ravie de vous voir.",
-    "qui es-tu": "Je suis <strong>ALVACOA</strong>, créée par David Laurens Kokoura (DAVIESLAY) à Abidjan. PWA + Messagerie + IA.",
+    "qui es-tu": "Je suis <strong>ALVACOA</strong>, créée par David Laurens Kokoura (DAVIESLAY) à Abidjan. IA + Messagerie + API Keys.",
     "merci": "Avec plaisir !",
-    "aide": "📚 <strong>Guide :</strong>\n• ALVACOA : Assistant IA\n• Linkchat! : Messagerie\n• PWA : Installable, hors-ligne\n• Menu ☰ : Paramètres, Contacts",
-    "côte d'ivoire": "🇨🇮 Côte d'Ivoire, Afrique de l'Ouest. Abidjan = capitale économique.",
-    "abidjan": "Abidjan, ville natale de DAVIESLAY !",
+    "aide": "📚 Guide :\n• ALVACOA : Assistant IA\n• Linkchat! : Messagerie\n• 🔑 API Keys : Générez vos clés\n• Menu ☰ : Paramètres, Historique",
+    "api": "🔑 Le portail API ALVACOA vous permet de générer des clés pour intégrer l'IA dans vos applications. Allez dans Menu > API Keys.",
+    "côte d'ivoire": "🇨🇮 Côte d'Ivoire, Afrique de l'Ouest. Abidjan.",
+    "abidjan": "Abidjan, ville de DAVIESLAY !",
     "davieslay": "DAVIESLAY = David Laurens Kokoura, créateur d'ALVACOA.",
-    "pwa": "Une PWA (Progressive Web App) est une application web installable qui fonctionne hors-ligne.",
-    "javascript": "JavaScript, langage web créé en 1995.",
-    "python": "Python, créé en 1991. Utilisé en IA.",
     "pythagore": "a² + b² = c²",
     "pi": "π ≈ 3,14159",
     "blague": "Pourquoi les devs détestent la nature ? Trop de bugs !"
 };
-
 function factorial(n) { if (n < 0) return NaN; if (n === 0 || n === 1) return 1; let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
-function evaluateMath(expr) {
-    try {
-        let e = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/,/g, '.').replace(/π/gi, Math.PI).replace(/\^/g, '**')
-            .replace(/sin\(/gi, 'Math.sin(').replace(/cos\(/gi, 'Math.cos(').replace(/tan\(/gi, 'Math.tan(')
-            .replace(/log\(/gi, 'Math.log10(').replace(/ln\(/gi, 'Math.log(').replace(/sqrt\(/gi, 'Math.sqrt(')
-            .replace(/(\d+)!/g, (_, n) => factorial(parseInt(n))).replace(/(\d+)%/g, '($1/100)');
-        let r = Function('"use strict"; return (' + e + ')')();
-        if (isNaN(r) || !isFinite(r)) return null;
-        return Number.isInteger(r) ? r : parseFloat(r.toFixed(10));
-    } catch (e) { return null; }
-}
+function evaluateMath(expr) { try { let e = expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/,/g,'.').replace(/π/gi,Math.PI).replace(/\^/g,'**').replace(/sin\(/gi,'Math.sin(').replace(/cos\(/gi,'Math.cos(').replace(/tan\(/gi,'Math.tan(').replace(/log\(/gi,'Math.log10(').replace(/ln\(/gi,'Math.log(').replace(/sqrt\(/gi,'Math.sqrt(').replace(/(\d+)!/g,(_,n)=>factorial(parseInt(n))).replace(/(\d+)%/g,'($1/100)'); let r = Function('"use strict"; return (' + e + ')')(); if (isNaN(r) || !isFinite(r)) return null; return Number.isInteger(r) ? r : parseFloat(r.toFixed(10)); } catch(e) { return null; } }
 function isMathExpression(t) { return /[\d]+\s*[\+\-\*\/\^]/.test(t) || /sin|cos|tan|log|ln|sqrt|pi|π/i.test(t); }
-function getLocalResponse(msg) {
-    const m = msg.toLowerCase().trim();
-    if (isMathExpression(msg)) { const ex = msg.replace(/calcule|calculer|résous/gi, '').replace(/\?/g, '').trim(); const r = evaluateMath(ex); if (r !== null) return `<strong>Calcul :</strong><br><div class="result-block">${ex} = <strong>${r}</strong></div>`; }
-    if (/rédige|rédiger|écris|écrire/i.test(m)) { if (/email/i.test(m)) return `<strong>Email :</strong><br><div class="result-block">Objet: ...<br>Bonjour,<br>...<br>Cordialement,</div>`; return "Email, Histoire, Poème ?"; }
-    if (knowledgeBase[m]) return knowledgeBase[m];
-    const words = m.split(/\s+/); let best = null, bs = 0;
-    for (let [k, v] of Object.entries(knowledgeBase)) { let s = 0; for (let w of words) if (k.includes(w) || w.includes(k)) s++; if (s > bs) { bs = s; best = v; } }
-    if (bs > 0.5) return best;
-    const al = msg.match(/(.+?) (?:est|signifie|veut dire) (.+)/i);
-    if (al) { knowledgeBase[al[1].trim().toLowerCase()] = al[2].trim(); saveKnowledge(); return `🧠 Appris: "${al[1].trim()}"`; }
-    return null;
-}
+function getLocalResponse(msg) { const m = msg.toLowerCase().trim(); if (isMathExpression(msg)) { const ex = msg.replace(/calcule|calculer|résous/gi,'').replace(/\?/g,'').trim(); const r = evaluateMath(ex); if (r !== null) return `<strong>Calcul :</strong><br><div class="result-block">${ex} = <strong>${r}</strong></div>`; } if (/rédige|rédiger|écris|écrire/i.test(m)) { if (/email/i.test(m)) return `<strong>Email :</strong><br><div class="result-block">Objet: ...<br>Bonjour,<br>...<br>Cordialement,</div>`; return "Email, Histoire, Poème ?"; } if (knowledgeBase[m]) return knowledgeBase[m]; const words = m.split(/\s+/); let best = null, bs = 0; for (let [k,v] of Object.entries(knowledgeBase)) { let s = 0; for (let w of words) if (k.includes(w) || w.includes(k)) s++; if (s > bs) { bs = s; best = v; } } if (bs > 0.5) return best; const al = msg.match(/(.+?) (?:est|signifie|veut dire) (.+)/i); if (al) { knowledgeBase[al[1].trim().toLowerCase()] = al[2].trim(); saveKnowledge(); return `🧠 Appris: "${al[1].trim()}"`; } return null; }
