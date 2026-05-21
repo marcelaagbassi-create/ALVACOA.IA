@@ -113,11 +113,10 @@ body.light-theme .chat-input-area { background:#f1f5f9; }
 .about-content { text-align:center; } .about-avatar { width:60px; height:60px; background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:bold; color:white; margin:0 auto 10px; } .about-info { text-align:left; font-size:13px; line-height:1.8; margin:12px 0; }
 .contact-item { display:flex; align-items:center; gap:10px; padding:10px 16px; cursor:pointer; transition:0.2s; border-radius:8px; margin:2px 4px; } .contact-item:hover { background:var(--bg-tertiary); } .contact-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold; color:white; flex-shrink:0; } .contact-name { font-size:13px; color:var(--text-secondary); } .contact-status { width:8px; height:8px; border-radius:50%; margin-left:auto; } .contact-status.online { background:var(--green); } .contact-status.offline { background:var(--text-muted); }
 
-/* PORTAIL API */
 .api-portal-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border); }
 .api-logo { width:48px; height:48px; background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; color:white; }
 .api-section { background:var(--bg-input); border-radius:12px; padding:16px; margin-bottom:16px; border:1px solid var(--border); }
-.api-section h4 { color:var(--accent); font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.api-section h4 { color:var(--accent); font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
 .api-key-display { background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); border-radius:12px; padding:16px; margin-bottom:16px; }
 .api-key-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
 .key-box { display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); padding:10px 14px; border-radius:8px; font-family:'Courier New',monospace; }
