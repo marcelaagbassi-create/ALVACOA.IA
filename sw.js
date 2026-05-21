@@ -1,8 +1,5 @@
-const CACHE_NAME = 'alvacoa-cache-v4';
-const PRECACHE_ASSETS = ['/','/index.html','/styles.css','/app.js','/modules.js','/api-portal.js','/ui.js','/manifest.json'];
-self.addEventListener('install', event => { console.log('🔧 SW install v4'); event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_ASSETS)).then(() => self.skipWaiting())); });
-self.addEventListener('activate', event => { console.log('🚀 SW activate v4'); event.waitUntil(caches.keys().then(names => Promise.all(names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n)))).then(() => self.clients.claim())); });
-self.addEventListener('fetch', event => { if (event.request.method !== 'GET') return; event.respondWith(caches.match(event.request).then(cached => { const fetchPromise = fetch(event.request).then(networkResponse => { if (networkResponse && networkResponse.ok) { const responseClone = networkResponse.clone(); caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone)); } return networkResponse; }).catch(() => cached); return cached || fetchPromise; })); });
-self.addEventListener('push', event => { let data = { title: 'ALVACOA', body: 'Nouvelle notification !', icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="24" fill="%236366f1"/><text x="50" y="68" font-size="52" font-weight="bold" fill="white">A</text></svg>' }; if (event.data) { try { data = { ...data, ...event.data.json() }; } catch(e) { data.body = event.data.text(); } } event.waitUntil(self.registration.showNotification(data.title, { body: data.body, icon: data.icon, vibrate: [200, 100, 200], requireInteraction: true })); });
-self.addEventListener('notificationclick', event => { event.notification.close(); event.waitUntil(clients.openWindow('/')); });
-self.addEventListener('message', event => { if (event.data?.type === 'SKIP_WAITING') self.skipWaiting(); if (event.data?.type === 'CLEAR_CACHES') { event.waitUntil(caches.keys().then(names => Promise.all(names.map(n => caches.delete(n))))); } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active')); if (document.getElementById('sidebar').classList.contains('open')) toggleSidebar(); } });
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); }));
+document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+console.log('🚀 ALVACOA v4.0 • IA + Messagerie + API + PWA');
+console.log('👤 David Laurens Kokoura • DAVIESLAY • Abidjan');
