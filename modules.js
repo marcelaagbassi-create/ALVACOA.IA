@@ -8,8 +8,7 @@ let knowledgeBase = JSON.parse(localStorage.getItem('alvacoa_knowledge')) || {
     "côte d'ivoire": "🇨🇮 Côte d'Ivoire, Afrique de l'Ouest. Abidjan.",
     "abidjan": "Abidjan, ville de DAVIESLAY !",
     "davieslay": "DAVIESLAY = David Laurens Kokoura, créateur d'ALVACOA.",
-    "pythagore": "a² + b² = c²",
-    "pi": "π ≈ 3,14159",
+    "pythagore": "a² + b² = c²", "pi": "π ≈ 3,14159",
     "blague": "Pourquoi les devs détestent la nature ? Trop de bugs !"
 };
 function factorial(n) { if (n < 0) return NaN; if (n === 0 || n === 1) return 1; let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
