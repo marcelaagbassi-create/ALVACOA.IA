@@ -9,7 +9,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ALVACOA">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%236366f1'/><text x='50' y='68' font-size='52' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -116,8 +118,8 @@
                 <div class="setting-row"><span>Pseudo</span><input type="text" id="usernameSetting" placeholder="Votre nom"></div>
             </div>
             <div class="settings-group"><h4>PWA</h4>
+                <div class="setting-row"><span>Icônes</span><button class="btn-primary" onclick="regenerateIcons()" style="font-size:11px;padding:6px 10px;">Regénérer</button></div>
                 <div class="setting-row"><span>Cache</span><button class="btn-secondary" onclick="clearPWACache()" style="font-size:11px;padding:6px 10px;">Vider</button></div>
-                <div class="setting-row"><span>Notifications</span><button class="btn-primary" onclick="requestNotificationPermission()" style="font-size:11px;padding:6px 10px;">Activer</button></div>
             </div>
             <div class="modal-actions"><button class="btn-primary" onclick="saveSettings()">Sauvegarder</button><button class="btn-secondary" onclick="closeSettings()">Fermer</button></div>
         </div>
@@ -132,7 +134,7 @@
             </div>
             <div class="api-section">
                 <h4>🔐 Créer une nouvelle clé</h4>
-                <div class="setting-row"><span>Nom</span><input type="text" id="newKeyName" placeholder="ex: MonApp, SiteWeb..." style="flex:1;margin-left:10px;"></div>
+                <div class="setting-row"><span>Nom</span><input type="text" id="newKeyName" placeholder="ex: MonApp" style="flex:1;margin-left:10px;"></div>
                 <div class="setting-row"><span>Niveau</span><select id="newKeyTier" style="margin-left:10px;"><option value="basic">Basic - 100 req/j</option><option value="pro">Pro - 1000 req/j</option><option value="enterprise">Enterprise - Illimité</option></select></div>
                 <div class="setting-row"><span>Modèle</span><select id="newKeyModel" style="margin-left:10px;"><option value="alvacoa-local">ALVACOA Local</option><option value="alvacoa-gemini">ALVACOA + Gemini</option><option value="alvacoa-deepseek">ALVACOA + DeepSeek</option></select></div>
                 <button class="btn-primary" onclick="generateAPIKey()" style="width:100%;margin-top:8px;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Générer la clé API</button>
@@ -149,13 +151,12 @@
     'Content-Type': 'application/json',
     'Authorization': 'Bearer sk-alvacoa-v4-xxxx'
   },
-  body: JSON.stringify({ message: 'Bonjour !', model: 'alvacoa-local' })
+  body: JSON.stringify({ message: 'Bonjour !' })
 }).then(r => r.json()).then(d => console.log(d.content));</code></pre></div></div>
             <div class="modal-actions"><button class="btn-secondary" onclick="closeAPIPortal()">Fermer</button></div>
         </div>
     </div>
 
-    <!-- AUTRES MODALS -->
     <div class="modal" id="historyModal">
         <div class="modal-content">
             <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Historique</h3>
@@ -188,9 +189,12 @@
 
     <div class="update-banner" id="updateBanner" style="display:none;"><span>🔄 Nouvelle version !</span><button onclick="updateApp()">Actualiser</button></div>
 
+    <!-- GÉNÉRATEUR D'ICÔNE PWA -->
+    <canvas id="iconCanvas" width="512" height="512" style="display:none;"></canvas>
+
     <script src="modules.js"></script>
     <script src="api-portal.js"></script>
     <script src="ui.js"></script>
     <script src="app.js"></script>
 </body>
-                                                                                                                                          </html>
+                                                                                                                                                                                                                                        </html>
