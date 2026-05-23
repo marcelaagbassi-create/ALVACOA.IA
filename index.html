@@ -4,14 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ALVACOA - IA, Messagerie & API</title>
+    
+    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Thème et couleurs -->
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ALVACOA">
+    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="msapplication-TileImage" content="icon-512.png">
+    
+    <!-- Icônes -->
     <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="shortcut icon" type="image/png" href="icon-192.png">
+    
+    <!-- Description et auteur -->
+    <meta name="description" content="ALVACOA - Assistant IA multimodal et messagerie par DAVIESLAY depuis Abidjan">
+    <meta name="author" content="David Laurens Kokoura (DAVIESLAY)">
+    <meta name="keywords" content="ALVACOA, IA, messagerie, assistant, PWA, Abidjan, Côte d'Ivoire">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="ALVACOA - Messagerie & IA">
+    <meta property="og:description" content="Assistant IA multimodal par DAVIESLAY">
+    <meta property="og:image" content="icon-512.png">
+    <meta property="og:type" content="website">
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -49,10 +72,10 @@
             <div class="header-info"><h2 id="headerTitle">ALVACOA</h2><p><span class="status-dot"></span> <span id="headerStatus">Assistant IA</span></p></div>
             <div class="header-actions">
                 <select class="model-select" id="modelSelect" onchange="changeModel()">
-                    <option value="gemini">Gemini</option>
-                    <option value="deepseek">DeepSeek</option>
-                    <option value="anthropic">Claude</option>
-                    <option value="alvacoa">🔑 ALVACOA</option>
+                    <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
+                    <option value="deepseek-chat-v2">🐋 DeepSeek V2</option>
+                    <option value="claude-3.5-sonnet">🧬 Claude 3.5 Sonnet</option>
+                    <option value="alvacoa">🔑 ALVACOA Local</option>
                 </select>
                 <button class="icon-btn" id="apiToggleBtn" onclick="toggleAPIMode()" title="API"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
                 <button class="icon-btn" onclick="openTrainModal()" title="Apprendre"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></button>
@@ -61,8 +84,7 @@
 
         <div class="chat-messages" id="chatMessages"></div>
         <div class="typing-status" id="typingStatus"></div>
-
-        <div class="chat-input-area">
+                <div class="chat-input-area">
             <div class="input-wrapper">
                 <button class="attach-btn" onclick="openUploadMenu()" title="Joindre"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
                 <textarea class="chat-input" id="chatInput" rows="1" placeholder="Message ou dictée vocale..." onkeydown="handleKeyDown(event)"></textarea>
@@ -112,7 +134,14 @@
             </div>
             <div class="settings-group"><h4>API</h4>
                 <div class="setting-row"><span>URL</span><input type="text" id="apiUrlSetting"></div>
-                <div class="setting-row"><span>Modèle</span><select id="defaultModelSelect"><option value="gemini">Gemini</option><option value="deepseek">DeepSeek</option><option value="anthropic">Claude</option><option value="alvacoa">🔑 ALVACOA</option></select></div>
+                <div class="setting-row"><span>Modèle par défaut</span>
+                    <select id="defaultModelSelect">
+                        <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
+                        <option value="deepseek-chat-v2">🐋 DeepSeek V2</option>
+                        <option value="claude-3.5-sonnet">🧬 Claude 3.5 Sonnet</option>
+                        <option value="alvacoa">🔑 ALVACOA Local</option>
+                    </select>
+                </div>
             </div>
             <div class="settings-group"><h4>Linkchat!</h4>
                 <div class="setting-row"><span>Pseudo</span><input type="text" id="usernameSetting" placeholder="Votre nom"></div>
@@ -136,7 +165,14 @@
                 <h4>🔐 Créer une nouvelle clé</h4>
                 <div class="setting-row"><span>Nom</span><input type="text" id="newKeyName" placeholder="ex: MonApp" style="flex:1;margin-left:10px;"></div>
                 <div class="setting-row"><span>Niveau</span><select id="newKeyTier" style="margin-left:10px;"><option value="basic">Basic - 100 req/j</option><option value="pro">Pro - 1000 req/j</option><option value="enterprise">Enterprise - Illimité</option></select></div>
-                <div class="setting-row"><span>Modèle</span><select id="newKeyModel" style="margin-left:10px;"><option value="alvacoa-local">ALVACOA Local</option><option value="alvacoa-gemini">ALVACOA + Gemini</option><option value="alvacoa-deepseek">ALVACOA + DeepSeek</option></select></div>
+                <div class="setting-row"><span>Modèle</span>
+                    <select id="newKeyModel" style="margin-left:10px;">
+                        <option value="alvacoa-local">ALVACOA Local</option>
+                        <option value="alvacoa-gemini-2.5-flash">ALVACOA + Gemini 2.5 Flash</option>
+                        <option value="alvacoa-deepseek-v2">ALVACOA + DeepSeek V2</option>
+                        <option value="alvacoa-claude-3.5-sonnet">ALVACOA + Claude 3.5 Sonnet</option>
+                    </select>
+                </div>
                 <button class="btn-primary" onclick="generateAPIKey()" style="width:100%;margin-top:8px;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Générer la clé API</button>
             </div>
             <div class="api-key-display" id="newKeyDisplay" style="display:none;">
@@ -151,7 +187,10 @@
     'Content-Type': 'application/json',
     'Authorization': 'Bearer sk-alvacoa-v4-xxxx'
   },
-  body: JSON.stringify({ message: 'Bonjour !' })
+  body: JSON.stringify({ 
+    message: 'Bonjour !',
+    model: 'gemini-2.5-flash'
+  })
 }).then(r => r.json()).then(d => console.log(d.content));</code></pre></div></div>
             <div class="modal-actions"><button class="btn-secondary" onclick="closeAPIPortal()">Fermer</button></div>
         </div>
@@ -173,6 +212,7 @@
                 <p><strong>Créateur :</strong> David Laurens Kokoura</p>
                 <p><strong>Alias :</strong> DAVIESLAY</p>
                 <p><strong>Localisation :</strong> Abidjan, Côte d'Ivoire</p>
+                <p><strong>Modèles :</strong> Gemini 2.5 Flash, DeepSeek V2, Claude 3.5 Sonnet</p>
                 <p><strong>API :</strong> Générez vos clés pour intégrer ALVACOA</p>
             </div>
             <div class="modal-actions"><button class="btn-secondary" onclick="closeAbout()">Fermer</button></div>
@@ -197,4 +237,4 @@
     <script src="ui.js"></script>
     <script src="app.js"></script>
 </body>
-                                                                                                                                                                                                                                        </html>
+</html>
