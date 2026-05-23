@@ -1,14 +1,31 @@
 {
   "name": "ALVACOA - Messagerie & IA",
   "short_name": "ALVACOA",
-  "description": "Assistant IA multimodal par David Laurens Kokoura (DAVIESLAY) depuis Abidjan",
+  "description": "Assistant IA multimodal par David Laurens Kokoura (DAVIESLAY) depuis Abidjan, Côte d'Ivoire",
   "start_url": "/",
+  "scope": "/",
+  "id": "alvacoa-pwa-v4",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#0a0a1a",
   "theme_color": "#6366f1",
   "lang": "fr-FR",
+  "dir": "ltr",
+  "categories": ["productivity", "social", "utilities", "education"],
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "prefer_related_applications": false,
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
+  ],
+  "screenshots": [
+    { "src": "screenshot-alvacoa.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "ALVACOA Assistant IA" },
+    { "src": "screenshot-linkchat.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Linkchat! Messagerie" }
+  ],
+  "shortcuts": [
+    { "name": "Assistant IA", "short_name": "ALVACOA", "url": "/?tab=alvacoa" },
+    { "name": "Linkchat!", "short_name": "Chat", "url": "/?tab=linkchat" }
+  ],
+  "related_applications": []
 }
