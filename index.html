@@ -72,7 +72,7 @@
             <div class="header-info"><h2 id="headerTitle">ALVACOA</h2><p><span class="status-dot"></span> <span id="headerStatus">Assistant IA</span></p></div>
             <div class="header-actions">
                 <select class="model-select" id="modelSelect" onchange="changeModel()">
-                    <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
+                    <option value="gemini-1.5-flash">⚡ Gemini 1.5 Flash</option>
                     <option value="deepseek-chat-v2">🐋 DeepSeek V2</option>
                     <option value="claude-3.5-sonnet">🧬 Claude 3.5 Sonnet</option>
                     <option value="alvacoa">🔑 ALVACOA Local</option>
@@ -136,7 +136,7 @@
                 <div class="setting-row"><span>URL</span><input type="text" id="apiUrlSetting"></div>
                 <div class="setting-row"><span>Modèle par défaut</span>
                     <select id="defaultModelSelect">
-                        <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash</option>
+                        <option value="gemini-1.5-flash">⚡ Gemini 1.5 Flash</option>
                         <option value="deepseek-chat-v2">🐋 DeepSeek V2</option>
                         <option value="claude-3.5-sonnet">🧬 Claude 3.5 Sonnet</option>
                         <option value="alvacoa">🔑 ALVACOA Local</option>
@@ -168,7 +168,7 @@
                 <div class="setting-row"><span>Modèle</span>
                     <select id="newKeyModel" style="margin-left:10px;">
                         <option value="alvacoa-local">ALVACOA Local</option>
-                        <option value="alvacoa-gemini-2.5-flash">ALVACOA + Gemini 2.5 Flash</option>
+                        <option value="alvacoa-gemini-1.5-flash">ALVACOA + Gemini 1.5 Flash</option>
                         <option value="alvacoa-deepseek-v2">ALVACOA + DeepSeek V2</option>
                         <option value="alvacoa-claude-3.5-sonnet">ALVACOA + Claude 3.5 Sonnet</option>
                     </select>
@@ -189,7 +189,7 @@
   },
   body: JSON.stringify({ 
     message: 'Bonjour !',
-    model: 'gemini-2.5-flash'
+    model: 'gemini-1.5-flash'
   })
 }).then(r => r.json()).then(d => console.log(d.content));</code></pre></div></div>
             <div class="modal-actions"><button class="btn-secondary" onclick="closeAPIPortal()">Fermer</button></div>
@@ -212,7 +212,7 @@
                 <p><strong>Créateur :</strong> David Laurens Kokoura</p>
                 <p><strong>Alias :</strong> DAVIESLAY</p>
                 <p><strong>Localisation :</strong> Abidjan, Côte d'Ivoire</p>
-                <p><strong>Modèles :</strong> Gemini 2.5 Flash, DeepSeek V2, Claude 3.5 Sonnet</p>
+                <p><strong>Modèles :</strong> Gemini 1.5 Flash, DeepSeek V2, Claude 3.5 Sonnet</p>
                 <p><strong>API :</strong> Générez vos clés pour intégrer ALVACOA</p>
             </div>
             <div class="modal-actions"><button class="btn-secondary" onclick="closeAbout()">Fermer</button></div>
@@ -237,4 +237,4 @@
     <script src="ui.js"></script>
     <script src="app.js"></script>
 </body>
-</html>
+                                                                                              </html>
