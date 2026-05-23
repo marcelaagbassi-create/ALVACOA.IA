@@ -1,6 +1,6 @@
 const API_URL = localStorage.getItem('alvacoa_api_url') || 'https://alvacoa-api.onrender.com/chat';
 let useAPI = false;
-let selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini';
+let selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-2.5-flash';
 let pendingFiles = [];
 let mediaRecorder = null;
 let audioChunks = [];
@@ -19,7 +19,7 @@ function saveKnowledge() { localStorage.setItem('alvacoa_knowledge', JSON.string
 function saveHistory() { localStorage.setItem('alvacoa_chat_history', JSON.stringify(chatHistory)); }
 function saveContacts() { localStorage.setItem('alvacoa_contacts', JSON.stringify(linkchatContacts)); }
 
-// ============ PWA ============
+// PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -38,20 +38,37 @@ if ('serviceWorker' in navigator) {
 function updateApp() { navigator.serviceWorker.ready.then(reg => { reg.waiting?.postMessage({ type: 'SKIP_WAITING' }); }); window.location.reload(); }
 function clearPWACache() { if (navigator.serviceWorker.controller) { navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHES' }); addMessage('assistant', '🧹 Cache vidé !', 'local'); } closeSettings(); }
 
-// ============ ICÔNE PWA ============
+// Icône PWA
 function setupPWAIcon() {
     const icon512 = localStorage.getItem('alvacoa_icon_512');
     const icon192 = localStorage.getItem('alvacoa_icon_192');
     if (icon512 && icon192) {
-        const link512 = document.createElement('link'); link512.rel = 'icon'; link512.type = 'image/png'; link512.sizes = '512x512'; link512.href = icon512; document.head.appendChild(link512);
-        const link192 = document.createElement('link'); link192.rel = 'icon'; link192.type = 'image/png'; link192.sizes = '192x192'; link192.href = icon192; document.head.appendChild(link192);
-        const appleIcon = document.createElement('link'); appleIcon.rel = 'apple-touch-icon'; appleIcon.href = icon192; document.head.appendChild(appleIcon);
-        console.log('✅ Icônes PWA chargées');
+        updateIconLink('icon', '512x512', icon512);
+        updateIconLink('icon', '192x192', icon192);
+        updateIconLink('apple-touch-icon', '192x192', icon192);
+        updateManifestIcons(icon192, icon512);
+    }
+}
+function updateIconLink(rel, sizes, href) {
+    let link = document.querySelector(`link[rel="${rel}"][sizes="${sizes}"]`);
+    if (!link) { link = document.createElement('link'); link.rel = rel; link.sizes = sizes; link.type = 'image/png'; document.head.appendChild(link); }
+    link.href = href;
+}
+function updateManifestIcons(icon192, icon512) {
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    if (manifestLink) {
+        manifestLink.href = 'data:application/json,' + encodeURIComponent(JSON.stringify({
+            name: "ALVACOA", short_name: "ALVACOA", start_url: "/", display: "standalone",
+            background_color: "#0a0a1a", theme_color: "#6366f1",
+            icons: [
+                { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+            ]
+        }));
     }
 }
 function generatePWAIcon() {
-    const canvas = document.getElementById('iconCanvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('iconCanvas'); const ctx = canvas.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 512, 512);
     gradient.addColorStop(0, '#6366f1'); gradient.addColorStop(0.5, '#a855f7'); gradient.addColorStop(1, '#ec4899');
     ctx.fillStyle = gradient;
@@ -60,13 +77,13 @@ function generatePWAIcon() {
     const icon512 = canvas.toDataURL('image/png');
     const canvas192 = document.createElement('canvas'); canvas192.width = 192; canvas192.height = 192; const ctx192 = canvas192.getContext('2d');
     const img = new Image();
-    img.onload = function() { ctx192.drawImage(img, 0, 0, 192, 192); const icon192 = canvas192.toDataURL('image/png'); localStorage.setItem('alvacoa_icon_512', icon512); localStorage.setItem('alvacoa_icon_192', icon192); downloadFile(icon512, 'icon-512.png'); setTimeout(() => downloadFile(icon192, 'icon-192.png'), 500); setupPWAIcon(); alert('✅ Icônes PWA générées !\n\nPlacez icon-192.png et icon-512.png dans votre dossier.'); };
+    img.onload = function() { ctx192.drawImage(img, 0, 0, 192, 192); const icon192 = canvas192.toDataURL('image/png'); localStorage.setItem('alvacoa_icon_512', icon512); localStorage.setItem('alvacoa_icon_192', icon192); downloadFile(icon512, 'icon-512.png'); setTimeout(() => downloadFile(icon192, 'icon-192.png'), 500); setupPWAIcon(); alert('✅ Icônes PWA générées !\n\nPlacez les fichiers dans votre dossier.'); };
     img.src = icon512;
 }
 function downloadFile(dataUrl, filename) { const link = document.createElement('a'); link.download = filename; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
 function regenerateIcons() { localStorage.removeItem('alvacoa_icon_512'); localStorage.removeItem('alvacoa_icon_192'); generatePWAIcon(); }
 
-// ============ SWITCH TAB ============
+// Switch Tab
 function switchTab(tab) {
     currentTab = tab;
     document.getElementById('pillAlvacoa').classList.toggle('active', tab === 'alvacoa');
@@ -99,14 +116,14 @@ function addMessage(type, content, source = 'local', attachment = null, senderNa
 function showTyping() { const d = document.createElement('div'); d.className = 'message assistant'; d.id = 'typingIndicator'; d.innerHTML = '<div class="msg-avatar">A</div><div class="msg-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>'; chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight; }
 function removeTyping() { const e = document.getElementById('typingIndicator'); if (e) e.remove(); }
 
-// ============ API ============
+// API
 async function getAPIResponse(msg) {
     if (selectedModel === 'alvacoa') return getLocalResponse(msg) || "🤔 Mode ALVACOA local.";
     try { const r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg, model:selectedModel}) }); const d = await r.json(); return d.content || 'Pas de réponse.'; }
     catch(e) { return `Erreur API: ${e.message}`; }
 }
 
-// ============ ENVOI ============
+// Envoi
 async function sendMessage() {
     const text = chatInput.value.trim(); if (!text && pendingFiles.length === 0) return;
     let att = null; if (pendingFiles.length > 0) { const f = pendingFiles[0]; att = { type: f.type.startsWith('image/')?'image':f.type.startsWith('video/')?'video':'file', url: f.url, name: f.name }; }
@@ -123,14 +140,14 @@ async function sendMessage() {
 }
 function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 
-// ============ CONTACTS ============
+// Contacts
 function addContact() { document.getElementById('addContactModal').classList.add('active'); }
 function closeAddContact() { document.getElementById('addContactModal').classList.remove('active'); }
 function saveContact() { const n = document.getElementById('contactName').value.trim(); if (!n) return; linkchatContacts.push({ id: Date.now().toString(), name: n, avatar: n[0].toUpperCase(), online: true, messages: [] }); saveContacts(); updateSidebarContacts(); closeAddContact(); }
 function updateSidebarContacts() { document.getElementById('sidebarContacts').innerHTML = linkchatContacts.map(c => `<div class="contact-item" onclick="openContact('${c.id}')"><div class="contact-avatar" style="background:hsl(${c.name.split('').reduce((h,ch)=>h+ch.charCodeAt(0),0)%360},60%,45%)">${c.avatar}</div><span class="contact-name">${c.name}</span><span class="contact-status ${c.online?'online':'offline'}"></span></div>`).join(''); }
 function openContact(id) { activeContact = linkchatContacts.find(c => c.id === id); switchTab('linkchat'); toggleSidebar(); }
 
-// ============ UPLOAD ============
+// Upload
 function openUploadMenu() { document.getElementById('uploadModal').classList.add('active'); updatePreviewGrid(); }
 function closeUploadMenu() { document.getElementById('uploadModal').classList.remove('active'); }
 function triggerFileInput(a) { const i = document.getElementById('fileInput'); i.accept = a; i.click(); }
@@ -140,15 +157,15 @@ function updatePreviewGrid() { document.getElementById('previewGrid').innerHTML 
 function removeFile(i) { URL.revokeObjectURL(pendingFiles[i].url); pendingFiles.splice(i,1); updatePreviewGrid(); }
 function confirmUpload() { closeUploadMenu(); if (pendingFiles.length > 0 || chatInput.value.trim()) sendMessage(); }
 
-// ============ MICRO ============
+// Micro
 async function toggleMicrophone() { const btn = document.getElementById('micBtn'), bars = document.getElementById('audioBars'); if (isRecording) { stopRecording(); return; } try { const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => audioChunks.push(e.data); mediaRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); bars.classList.remove('active'); chatInput.focus(); }; mediaRecorder.start(); isRecording = true; btn.classList.add('recording'); bars.classList.add('active'); } catch (e) { addMessage('assistant', 'Erreur micro: ' + e.message, 'local'); } }
 function stopRecording() { if (mediaRecorder && isRecording) { mediaRecorder.stop(); isRecording = false; document.getElementById('micBtn').classList.remove('recording'); } }
 
-// ============ SIDEBAR ============
+// Sidebar
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
 function openSettings() { toggleSidebar(); document.getElementById('settingsModal').classList.add('active'); document.getElementById('apiUrlSetting').value = API_URL; document.getElementById('defaultModelSelect').value = selectedModel; document.getElementById('themeSelect').value = document.body.classList.contains('light-theme') ? 'light' : 'dark'; document.getElementById('usernameSetting').value = username; }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
-function saveSettings() { API_URL = document.getElementById('apiUrlSetting').value; selectedModel = document.getElementById('defaultModelSelect').value; username = document.getElementById('usernameSetting').value || 'Moi'; localStorage.setItem('alvacoa_api_url', API_URL); localStorage.setItem('alvacoa_default_model', selectedModel); localStorage.setItem('alvacoa_username', username); closeSettings(); addMessage('assistant', '✅ Sauvegardé !', 'local'); }
+function saveSettings() { API_URL = document.getElementById('apiUrlSetting').value; selectedModel = document.getElementById('defaultModelSelect').value; username = document.getElementById('usernameSetting').value || 'Moi'; localStorage.setItem('alvacoa_api_url', API_URL); localStorage.setItem('alvacoa_default_model', selectedModel); localStorage.setItem('alvacoa_username', username); closeSettings(); addMessage('assistant', '✅ Paramètres sauvegardés !', 'local'); }
 function changeTheme() { const t = document.getElementById('themeSelect').value; document.body.classList.toggle('light-theme', t === 'light'); localStorage.setItem('alvacoa_theme', t); }
 function changeFontSize() { const s = document.getElementById('fontSizeSelect').value; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[s]); localStorage.setItem('alvacoa_font_size', s); }
 function clearAllData() { if (confirm('Effacer TOUT ?')) { localStorage.clear(); location.reload(); } }
@@ -165,15 +182,16 @@ function closeTrainModal() { document.getElementById('trainModal').classList.rem
 function trainAI() { const q = document.getElementById('trainQuestion').value.trim().toLowerCase(); const a = document.getElementById('trainAnswer').value.trim(); if (!q || !a) return; knowledgeBase[q] = a; saveKnowledge(); addMessage('assistant', `🧠 Appris: "${q}"`, 'local'); closeTrainModal(); }
 function initiateCall() { addMessage('assistant', '📞 Appel vers ' + activeContact.name + '...', 'local'); }
 
-// ============ INIT ============
+// Init
 function init() {
     const theme = localStorage.getItem('alvacoa_theme') || 'dark'; document.body.classList.toggle('light-theme', theme === 'light');
     const fs = localStorage.getItem('alvacoa_font_size') || 'medium'; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[fs]);
-    selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini'; document.getElementById('modelSelect').value = selectedModel;
+    selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-2.5-flash'; document.getElementById('modelSelect').value = selectedModel;
     username = localStorage.getItem('alvacoa_username') || 'Moi';
     setupPWAIcon();
     if (!localStorage.getItem('alvacoa_icon_512')) { setTimeout(generatePWAIcon, 1500); }
     updateSidebarContacts(); switchTab('alvacoa');
     chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
+    console.log('🚀 ALVACOA v4.0 • Gemini 2.5 Flash • DeepSeek V2 • Claude 3.5 Sonnet');
 }
 init();
