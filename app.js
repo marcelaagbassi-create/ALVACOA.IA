@@ -1,6 +1,6 @@
 const API_URL = localStorage.getItem('alvacoa_api_url') || 'https://alvacoa-api.onrender.com/chat';
 let useAPI = false;
-let selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-2.5-flash';
+let selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-1.5-flash';
 let pendingFiles = [];
 let mediaRecorder = null;
 let audioChunks = [];
@@ -186,12 +186,12 @@ function initiateCall() { addMessage('assistant', '📞 Appel vers ' + activeCon
 function init() {
     const theme = localStorage.getItem('alvacoa_theme') || 'dark'; document.body.classList.toggle('light-theme', theme === 'light');
     const fs = localStorage.getItem('alvacoa_font_size') || 'medium'; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[fs]);
-    selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-2.5-flash'; document.getElementById('modelSelect').value = selectedModel;
+    selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-1.5-flash'; document.getElementById('modelSelect').value = selectedModel;
     username = localStorage.getItem('alvacoa_username') || 'Moi';
     setupPWAIcon();
     if (!localStorage.getItem('alvacoa_icon_512')) { setTimeout(generatePWAIcon, 1500); }
     updateSidebarContacts(); switchTab('alvacoa');
     chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
-    console.log('🚀 ALVACOA v4.0 • Gemini 2.5 Flash • DeepSeek V2 • Claude 3.5 Sonnet');
+    console.log('🚀 ALVACOA v4.0 • Gemini 1.5 Flash • DeepSeek V2 • Claude 3.5 Sonnet');
 }
 init();
