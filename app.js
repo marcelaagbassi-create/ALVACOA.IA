@@ -1,6 +1,6 @@
 const API_URL = localStorage.getItem('alvacoa_api_url') || 'https://alvacoa-api.onrender.com/chat';
 let useAPI = false;
-let selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-1.5-flash';
+let selectedModel = localStorage.getItem('alvacoa_default_model') || 'mistral-small';
 let pendingFiles = [];
 let mediaRecorder = null;
 let audioChunks = [];
