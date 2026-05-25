@@ -192,6 +192,6 @@ function init() {
     if (!localStorage.getItem('alvacoa_icon_512')) { setTimeout(generatePWAIcon, 1500); }
     updateSidebarContacts(); switchTab('alvacoa');
     chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
-    console.log('🚀 ALVACOA v4.0 • Gemini 1.5 Flash • DeepSeek V2 • Claude 3.5 Sonnet');
+    console.log('🚀 ALVACOA v4.0 • Gemini 1.5 Flash • Mistral Small • DeepSeek V2 • Claude 3.5 Sonnet');
 }
 init();
