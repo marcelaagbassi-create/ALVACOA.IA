@@ -36,7 +36,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 function updateApp() { navigator.serviceWorker.ready.then(reg => { reg.waiting?.postMessage({ type: 'SKIP_WAITING' }); }); window.location.reload(); }
-function clearPWACache() { if (navigator.serviceWorker.controller) { navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHES' }); addMessage('assistant', '🧹 Cache vidé !', 'local'); } closeSettings(); }
+function clearPWACache() { if (navigator.serviceWorker.controller) { navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHES' }); addMessage('assistant', '🧹 Cache vidé !', 'local'); } }
 
 // Icône PWA
 function setupPWAIcon() {
@@ -59,7 +59,7 @@ function updateManifestIcons(icon192, icon512) {
     if (manifestLink) {
         manifestLink.href = 'data:application/json,' + encodeURIComponent(JSON.stringify({
             name: "ALVACOA", short_name: "ALVACOA", start_url: "/", display: "standalone",
-            background_color: "#0a0a1a", theme_color: "#6366f1",
+            background_color: "#04050a", theme_color: "#0b1220",
             icons: [
                 { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
                 { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
@@ -72,12 +72,12 @@ function generatePWAIcon() {
     const gradient = ctx.createLinearGradient(0, 0, 512, 512);
     gradient.addColorStop(0, '#6366f1'); gradient.addColorStop(0.5, '#a855f7'); gradient.addColorStop(1, '#ec4899');
     ctx.fillStyle = gradient;
-    ctx.beginPath(); ctx.moveTo(128, 0); ctx.lineTo(384, 0); ctx.quadraticCurveTo(512, 0, 512, 128); ctx.lineTo(512, 384); ctx.quadraticCurveTo(512, 512, 384, 512); ctx.lineTo(128, 512); ctx.quadraticCurveTo(0, 512, 0, 384); ctx.lineTo(0, 128); ctx.quadraticCurveTo(0, 0, 128, 0); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(128, 0); ctx.lineTo(384, 0); ctx.quadraticCurveTo(512, 0, 512, 128); ctx.lineTo(512, 384); ctx.quadraticCurveTo(512, 512, 384, 512); ctx.lineTo(128, 512); ctx.quadraticCurveTo(0, 512, 0, 384); ctx.lineTo(0, 128); ctx.quadraticCurveTo(0, 0, 128, 0); ctx.closePath(); ctx.fill();
     ctx.fillStyle = 'white'; ctx.font = 'bold 280px "Segoe UI", Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('A', 256, 280);
     const icon512 = canvas.toDataURL('image/png');
     const canvas192 = document.createElement('canvas'); canvas192.width = 192; canvas192.height = 192; const ctx192 = canvas192.getContext('2d');
     const img = new Image();
-    img.onload = function() { ctx192.drawImage(img, 0, 0, 192, 192); const icon192 = canvas192.toDataURL('image/png'); localStorage.setItem('alvacoa_icon_512', icon512); localStorage.setItem('alvacoa_icon_192', icon192); downloadFile(icon512, 'icon-512.png'); setTimeout(() => downloadFile(icon192, 'icon-192.png'), 500); setupPWAIcon(); alert('✅ Icônes PWA générées !\n\nPlacez les fichiers dans votre dossier.'); };
+    img.onload = function() { ctx192.drawImage(img, 0, 0, 192, 192); const icon192 = canvas192.toDataURL('image/png'); localStorage.setItem('alvacoa_icon_512', icon512); localStorage.setItem('alvacoa_icon_192', icon192); updateIconLink('icon', '512x512', icon512); updateIconLink('icon', '192x192', icon192); updateIconLink('apple-touch-icon', '192x192', icon192); updateManifestIcons(icon192, icon512); }
     img.src = icon512;
 }
 function downloadFile(dataUrl, filename) { const link = document.createElement('a'); link.download = filename; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); }
@@ -90,19 +90,19 @@ function switchTab(tab) {
     document.getElementById('pillLinkchat').classList.toggle('active', tab === 'linkchat');
     document.getElementById('modelSelect').style.display = tab === 'alvacoa' ? '' : 'none';
     document.getElementById('apiToggleBtn').style.display = tab === 'alvacoa' ? '' : 'none';
-    if (tab === 'alvacoa') { document.getElementById('headerTitle').textContent = 'ALVACOA'; document.getElementById('headerStatus').textContent = useAPI ? `API: ${selectedModel}` : 'Assistant IA'; document.getElementById('headerAvatar').textContent = 'A'; chatInput.placeholder = 'Message...'; }
-    else { document.getElementById('headerTitle').textContent = activeContact ? activeContact.name : 'Linkchat!'; document.getElementById('headerStatus').textContent = activeContact ? 'En ligne' : 'Messagerie'; document.getElementById('headerAvatar').textContent = activeContact ? activeContact.name[0].toUpperCase() : 'L'; chatInput.placeholder = 'Votre message...'; }
+    if (tab === 'alvacoa') { document.getElementById('headerTitle').textContent = 'ALVACOA'; document.getElementById('headerStatus').textContent = useAPI ? `API: ${selectedModel}` : 'Assistant IA'; }
+    else { document.getElementById('headerTitle').textContent = activeContact ? activeContact.name : 'Linkchat!'; document.getElementById('headerStatus').textContent = activeContact ? 'En ligne' : 'Contact non sélectionné'; }
     loadMessages(); updateSidebarContacts();
 }
 function loadMessages() {
     chatMessages.innerHTML = '';
     const msgs = currentTab === 'alvacoa' ? currentSession : (activeContact?.messages || []);
     msgs.forEach(msg => { const type = currentTab === 'alvacoa' ? msg.type : (msg.from === 'me' ? 'user' : 'contact'); const sender = currentTab === 'linkchat' && msg.from === 'contact' ? activeContact?.name : null; addMessageToDOM(type, msg.content, msg.source || 'local', msg.attachment, sender); });
-    if (!msgs.length) { chatMessages.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-secondary);text-align:center;"><div style="width:80px;height:80px;background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:white;">${currentTab==='alvacoa'?'A':'L'}</div><h3>${currentTab==='alvacoa'?'ALVACOA':'Linkchat!'}</h3><p>${currentTab==='alvacoa'?'Assistant IA • API Developer':'Messagerie instantanée'}</p></div>`; }
+    if (!msgs.length) { chatMessages.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-secondary);text-align:center;padding:40px 16px;min-height:220px;"><div style="width:92px;height:92px;background:linear-gradient(135deg,var(--accent),#a855f7);border-radius:18px;display:flex;align-items:center;justify-content:center;color:white;font-size:32px;font-weight:700;">A</div><div style="font-size:15px;color:var(--text-primary);opacity:0.95;">ALVACOA</div><div style="font-size:13px;color:var(--text-muted);">Assistant IA · API Developer</div></div>`; }
 }
 function addMessageToDOM(type, content, source = 'local', attachment = null, senderName = null) {
     const div = document.createElement('div'); div.className = `message ${type}`;
-    let attHTML = ''; if (attachment) { if (attachment.type === 'image') attHTML = `<img src="${attachment.url}" loading="lazy">`; else if (attachment.type === 'video') attHTML = `<video src="${attachment.url}" controls></video>`; else attHTML = `<div class="file-attachment">📄 ${attachment.name}</div>`; }
+    let attHTML = ''; if (attachment) { if (attachment.type === 'image') attHTML = `<img src="${attachment.url}" loading="lazy">`; else if (attachment.type === 'video') attHTML = `<video src="${attachment.url}" controls></video>`; else attHTML = `<a href="${attachment.url}" download>${attachment.name}</a>`; }
     const badge = (type === 'assistant' || type === 'contact') ? `<span class="badge ${source}">${source.toUpperCase()}</span>` : '';
     const av = type === 'user' ? username[0].toUpperCase() : (senderName ? senderName[0].toUpperCase() : 'A');
     div.innerHTML = `<div class="msg-avatar">${av}</div><div class="msg-bubble">${senderName ? `<strong style="color:var(--accent);font-size:11px;">${senderName}</strong><br>` : ''}${attHTML}${content}${badge}</div>`;
@@ -119,7 +119,7 @@ function removeTyping() { const e = document.getElementById('typingIndicator'); 
 // API
 async function getAPIResponse(msg) {
     if (selectedModel === 'alvacoa') return getLocalResponse(msg) || "🤔 Mode ALVACOA local.";
-    try { const r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg, model:selectedModel}) }); const d = await r.json(); return d.content || 'Pas de réponse.'; }
+    try { const r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:msg, model:selectedModel}) }); const d = await r.json(); return d?.content || JSON.stringify(d); }
     catch(e) { return `Erreur API: ${e.message}`; }
 }
 
@@ -144,7 +144,7 @@ function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDef
 function addContact() { document.getElementById('addContactModal').classList.add('active'); }
 function closeAddContact() { document.getElementById('addContactModal').classList.remove('active'); }
 function saveContact() { const n = document.getElementById('contactName').value.trim(); if (!n) return; linkchatContacts.push({ id: Date.now().toString(), name: n, avatar: n[0].toUpperCase(), online: true, messages: [] }); saveContacts(); updateSidebarContacts(); closeAddContact(); }
-function updateSidebarContacts() { document.getElementById('sidebarContacts').innerHTML = linkchatContacts.map(c => `<div class="contact-item" onclick="openContact('${c.id}')"><div class="contact-avatar" style="background:hsl(${c.name.split('').reduce((h,ch)=>h+ch.charCodeAt(0),0)%360},60%,45%)">${c.avatar}</div><span class="contact-name">${c.name}</span><span class="contact-status ${c.online?'online':'offline'}"></span></div>`).join(''); }
+function updateSidebarContacts() { document.getElementById('sidebarContacts').innerHTML = linkchatContacts.map(c => `<div class="contact-item" onclick="openContact('${c.id}')"><div class="contact-avatar">${c.avatar}</div><div class="contact-name">${c.name}</div></div>`).join(''); }
 function openContact(id) { activeContact = linkchatContacts.find(c => c.id === id); switchTab('linkchat'); toggleSidebar(); }
 
 // Upload
@@ -152,46 +152,70 @@ function openUploadMenu() { document.getElementById('uploadModal').classList.add
 function closeUploadMenu() { document.getElementById('uploadModal').classList.remove('active'); }
 function triggerFileInput(a) { const i = document.getElementById('fileInput'); i.accept = a; i.click(); }
 function triggerCamera() { document.getElementById('cameraInput').click(); }
-function handleFileSelect(e) { Array.from(e.target.files).forEach(f => { pendingFiles.push({ name:f.name, type:f.type, size:f.size, url:URL.createObjectURL(f), file:f }); }); updatePreviewGrid(); e.target.value = ''; }
-function updatePreviewGrid() { document.getElementById('previewGrid').innerHTML = pendingFiles.map((f,i) => { let p = ''; if (f.type.startsWith('image/')) p = `<img src="${f.url}">`; else if (f.type.startsWith('video/')) p = `<video src="${f.url}"></video>`; else p = '<span>📄</span>'; return `<div class="preview-item">${p}<div class="remove-btn" onclick="removeFile(${i})">✕</div></div>`; }).join(''); }
+function handleFileSelect(e) { Array.from(e.target.files).forEach(f => { pendingFiles.push({ name:f.name, type:f.type, size:f.size, url:URL.createObjectURL(f), file:f }); }); updatePreviewGrid(); }
+function updatePreviewGrid() { document.getElementById('previewGrid').innerHTML = pendingFiles.map((f,i) => { let p = ''; if (f.type.startsWith('image/')) p = `<img src="${f.url}">`; else if (f.type.startsWith('video/')) p = `<video src="${f.url}" controls></video>`; else p = `<div class="file-item">${f.name}</div>`; return `<div class="preview-item">${p}<button class="remove-btn" onclick="removeFile(${i})">×</button></div>`; }).join(''); }
 function removeFile(i) { URL.revokeObjectURL(pendingFiles[i].url); pendingFiles.splice(i,1); updatePreviewGrid(); }
 function confirmUpload() { closeUploadMenu(); if (pendingFiles.length > 0 || chatInput.value.trim()) sendMessage(); }
 
 // Micro
-async function toggleMicrophone() { const btn = document.getElementById('micBtn'), bars = document.getElementById('audioBars'); if (isRecording) { stopRecording(); return; } try { const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => audioChunks.push(e.data); mediaRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); bars.classList.remove('active'); chatInput.focus(); }; mediaRecorder.start(); isRecording = true; btn.classList.add('recording'); bars.classList.add('active'); } catch (e) { addMessage('assistant', 'Erreur micro: ' + e.message, 'local'); } }
-function stopRecording() { if (mediaRecorder && isRecording) { mediaRecorder.stop(); isRecording = false; document.getElementById('micBtn').classList.remove('recording'); } }
+async function toggleMicrophone() { const btn = document.getElementById('micBtn'), bars = document.getElementById('audioBars'); if (isRecording) { stopRecording(); return; } try { const stream = await navigator.mediaDevices.getUserMedia({ audio:true }); mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => audioChunks.push(e.data); mediaRecorder.onstop = async () => { const blob = new Blob(audioChunks, { type: 'audio/webm' }); const url = URL.createObjectURL(blob); pendingFiles.push({ name: 'recording.webm', type: 'audio/webm', size: blob.size, url, file: blob }); updatePreviewGrid(); addMessage('user', 'Enregistrement', 'local', { type: 'file', url, name: 'recording.webm' }); }; mediaRecorder.start(); isRecording = true; document.getElementById('micBtn').classList.add('recording'); bars.classList.add('active'); } catch(e) { addMessage('assistant', 'Microphone non disponible', 'local'); } }
+function stopRecording() { if (mediaRecorder && isRecording) { mediaRecorder.stop(); isRecording = false; document.getElementById('micBtn').classList.remove('recording'); document.getElementById('audioBars').classList.remove('active'); } }
 
 // Sidebar
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
-function openSettings() { toggleSidebar(); document.getElementById('settingsModal').classList.add('active'); document.getElementById('apiUrlSetting').value = API_URL; document.getElementById('defaultModelSelect').value = selectedModel; document.getElementById('themeSelect').value = document.body.classList.contains('light-theme') ? 'light' : 'dark'; document.getElementById('usernameSetting').value = username; }
+function openSettings() { toggleSidebar(); document.getElementById('settingsModal').classList.add('active'); document.getElementById('apiUrlSetting').value = API_URL; document.getElementById('defaultModelSelect').value = selectedModel; document.getElementById('usernameSetting').value = username; const themeSel = document.getElementById('themeSelect'); if (themeSel) themeSel.value = localStorage.getItem('alvacoa_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
-function saveSettings() { API_URL = document.getElementById('apiUrlSetting').value; selectedModel = document.getElementById('defaultModelSelect').value; username = document.getElementById('usernameSetting').value || 'Moi'; localStorage.setItem('alvacoa_api_url', API_URL); localStorage.setItem('alvacoa_default_model', selectedModel); localStorage.setItem('alvacoa_username', username); closeSettings(); addMessage('assistant', '✅ Paramètres sauvegardés !', 'local'); }
-function changeTheme() { const t = document.getElementById('themeSelect').value; document.body.classList.toggle('light-theme', t === 'light'); localStorage.setItem('alvacoa_theme', t); }
-function changeFontSize() { const s = document.getElementById('fontSizeSelect').value; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[s]); localStorage.setItem('alvacoa_font_size', s); }
+function saveSettings() { API_URL = document.getElementById('apiUrlSetting').value; selectedModel = document.getElementById('defaultModelSelect').value; username = document.getElementById('usernameSetting').value || username; localStorage.setItem('alvacoa_default_model', selectedModel); localStorage.setItem('alvacoa_username', username); addMessage('assistant', 'Paramètres sauvegardés', 'local'); closeSettings(); }
+function changeTheme() { const t = document.getElementById('themeSelect').value; document.body.classList.toggle('light-theme', t === 'light'); localStorage.setItem('alvacoa_theme', t); const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', t === 'dark' ? '#0b1220' : '#6366f1'); }
+function changeFontSize() { const s = document.getElementById('fontSizeSelect').value; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[s] || '14px'); localStorage.setItem('alvacoa_font_size', s); }
 function clearAllData() { if (confirm('Effacer TOUT ?')) { localStorage.clear(); location.reload(); } }
-function openHistory() { toggleSidebar(); document.getElementById('historyModal').classList.add('active'); document.getElementById('historyList').innerHTML = chatHistory.length ? chatHistory.slice().reverse().map(h => `<div class="history-item" onclick="loadHistory('${h.id}')"><div>${h.preview}</div><div class="history-date">${h.date}</div></div>`).join('') : '<p style="color:var(--text-muted);text-align:center;padding:20px;">Vide</p>'; }
+function openHistory() { toggleSidebar(); document.getElementById('historyModal').classList.add('active'); document.getElementById('historyList').innerHTML = chatHistory.length ? chatHistory.slice().reverse().map(h => `<div class="history-item" onclick="loadHistory('${h.id}')"><strong>${h.title || 'Session'}</strong><div style=\"font-size:12px;color:var(--text-muted);\">${new Date(h.createdAt || h.timestamp || Date.now()).toLocaleString()}</div></div>`).join('') : '<p style="color:var(--text-muted);text-align:center;padding:20px;">Aucun historique</p>' }
 function closeHistory() { document.getElementById('historyModal').classList.remove('active'); }
-function loadHistory(id) { const s = chatHistory.find(h => h.id == id); if (s) { chatMessages.innerHTML = ''; currentSession = []; s.messages.forEach(m => addMessage(m.type, m.content, m.source)); closeHistory(); } }
+function loadHistory(id) { const s = chatHistory.find(h => h.id == id); if (s) { chatMessages.innerHTML = ''; currentSession = []; s.messages.forEach(m => addMessage(m.type, m.content, m.source)); } }
 function openAbout() { toggleSidebar(); document.getElementById('aboutModal').classList.add('active'); }
 function closeAbout() { document.getElementById('aboutModal').classList.remove('active'); }
-function exportData() { toggleSidebar(); const d = { knowledge: knowledgeBase, history: chatHistory, contacts: linkchatContacts }; const b = new Blob([JSON.stringify(d)], { type:'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'alvacoa_backup.json'; a.click(); }
+function exportData() { toggleSidebar(); const d = { knowledge: knowledgeBase, history: chatHistory, contacts: linkchatContacts }; const b = new Blob([JSON.stringify(d)], { type:'application/json' }); downloadFile(URL.createObjectURL(b), 'alvacoa_export.json'); addMessage('assistant', 'Export Généré', 'local'); }
 function toggleAPIMode() { useAPI = !useAPI; document.getElementById('apiToggleBtn').classList.toggle('active', useAPI); document.getElementById('headerStatus').textContent = useAPI ? `API: ${selectedModel}` : 'Assistant IA'; }
 function changeModel() { selectedModel = document.getElementById('modelSelect').value; if (useAPI) document.getElementById('headerStatus').textContent = `API: ${selectedModel}`; }
 function openTrainModal() { document.getElementById('trainModal').classList.add('active'); }
 function closeTrainModal() { document.getElementById('trainModal').classList.remove('active'); }
-function trainAI() { const q = document.getElementById('trainQuestion').value.trim().toLowerCase(); const a = document.getElementById('trainAnswer').value.trim(); if (!q || !a) return; knowledgeBase[q] = a; saveKnowledge(); addMessage('assistant', `🧠 Appris: "${q}"`, 'local'); closeTrainModal(); }
-function initiateCall() { addMessage('assistant', '📞 Appel vers ' + activeContact.name + '...', 'local'); }
+function trainAI() { const q = document.getElementById('trainQuestion').value.trim().toLowerCase(); const a = document.getElementById('trainAnswer').value.trim(); if (!q || !a) return; knowledgeBase[q] = a; saveKnowledge(); addMessage('assistant', 'Connaissance ajoutée', 'local'); closeTrainModal(); }
+function initiateCall() { addMessage('assistant', '📞 Appel vers ' + (activeContact?.name || '...') + '...', 'local'); }
 
 // Init
 function init() {
-    const theme = localStorage.getItem('alvacoa_theme') || 'dark'; document.body.classList.toggle('light-theme', theme === 'light');
-    const fs = localStorage.getItem('alvacoa_font_size') || 'medium'; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[fs]);
+    // Theme detection: use stored value if present, otherwise follow OS preference
+    const storedTheme = localStorage.getItem('alvacoa_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = storedTheme !== null ? storedTheme : (prefersDark ? 'dark' : 'light');
+    document.body.classList.toggle('light-theme', theme === 'light');
+
+    // Reflect in settings UI if present
+    const themeSel = document.getElementById('themeSelect'); if (themeSel) themeSel.value = theme;
+
+    // Listen for OS theme changes but only when the user hasn't explicitly chosen a theme
+    try {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      mq.addEventListener && mq.addEventListener('change', e => {
+        if (!localStorage.getItem('alvacoa_theme')) {
+          const newTheme = e.matches ? 'dark' : 'light';
+          document.body.classList.toggle('light-theme', newTheme === 'light');
+          const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', newTheme === 'dark' ? '#0b1220' : '#6366f1');
+        }
+      });
+    } catch(e) { /* ignore */ }
+
+    const fs = localStorage.getItem('alvacoa_font_size') || 'medium'; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[fs] || '14px');
     selectedModel = localStorage.getItem('alvacoa_default_model') || 'gemini-1.5-flash'; document.getElementById('modelSelect').value = selectedModel;
     username = localStorage.getItem('alvacoa_username') || 'Moi';
     setupPWAIcon();
     if (!localStorage.getItem('alvacoa_icon_512')) { setTimeout(generatePWAIcon, 1500); }
     updateSidebarContacts(); switchTab('alvacoa');
     chatInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
+
+    // update theme-color meta tag to better match dark theme
+    const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#6366f1');
+
     console.log('🚀 ALVACOA v4.0 • Gemini 1.5 Flash • Mistral Small • DeepSeek V2 • Claude 3.5 Sonnet');
 }
 init();
