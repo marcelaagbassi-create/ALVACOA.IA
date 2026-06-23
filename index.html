@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ALVACOA - IA, Messagerie & API</title>
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    
+
     <!-- Thème et couleurs -->
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +15,7 @@
     <meta name="apple-mobile-web-app-title" content="ALVACOA">
     <meta name="msapplication-TileColor" content="#6366f1">
     <meta name="msapplication-TileImage" content="icon-512.png">
-    
+
     <!-- Icônes -->
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -23,118 +23,152 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <link rel="shortcut icon" type="image/png" href="icon-192.png">
-    
+
     <!-- Description et auteur -->
     <meta name="description" content="ALVACOA - Assistant IA multimodal et messagerie par DAVIESLAY depuis Abidjan">
     <meta name="author" content="David Laurens Kokoura (DAVIESLAY)">
     <meta name="keywords" content="ALVACOA, IA, messagerie, assistant, PWA, Abidjan, Côte d'Ivoire">
-    
+
     <!-- Open Graph -->
     <meta property="og:title" content="ALVACOA - Messagerie & IA">
     <meta property="og:description" content="Assistant IA multimodal par DAVIESLAY">
     <meta property="og:image" content="icon-512.png">
     <meta property="og:type" content="website">
-    
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
         <div class="sidebar-header">
-            <div class="sidebar-avatar">A</div>
+            <div class="sidebar-avatar" aria-hidden="true">A</div>
             <div class="sidebar-title"><h3>ALVACOA</h3><p>v4.0 • IA + API</p></div>
-            <button class="sidebar-close" onclick="toggleSidebar()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <button class="sidebar-close" onclick="toggleSidebar()" aria-label="Fermer le menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
-        <nav class="sidebar-nav">
-            <button class="nav-item" onclick="openSettings()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Paramètres</span></button>
-            <button class="nav-item" onclick="openHistory()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Historique</span></button>
-            <button class="nav-item" onclick="openAPIPortal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>🔑 API Keys</span></button>
-            <button class="nav-item" onclick="openAbout()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span>À propos</span></button>
-            <button class="nav-item" onclick="exportData()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Exporter</span></button>
+        <nav class="sidebar-nav" aria-label="Navigation principale">
+            <button class="nav-item" onclick="openSettings()" aria-label="Paramètres">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 2.28 17.9l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09c.7 0 1.3-.39 1.51-1a1.65 1.65 0 0 0-.33-1.82L4.3 3.28A2 2 0 1 1 7.13.45l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 11 1.34V1a2 2 0 1 1 4 0v.34c.18.6.72 1.08 1.32 1.08h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06A2 2 0 1 1 21.72 4.1l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c0 .61.39 1.2 1 1.51H21a2 2 0 1 1 0 4h-.09c-.61 0-1.2.39-1.51 1z"/></svg>
+                Paramètres
+            </button>
+            <button class="nav-item" onclick="openHistory()" aria-label="Historique">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3v6h6"/><path d="M21 21a9 9 0 1 0-9 0"/></svg>
+                Historique
+            </button>
+            <button class="nav-item" onclick="openAPIPortal()" aria-label="Portail API">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v6"/><path d="M12 22v-6"/><path d="M20 12h-6"/><path d="M10 12H4"/></svg>
+                Portail API
+            </button>
+            <button class="nav-item" onclick="openAbout()" aria-label="À propos">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                À propos
+            </button>
+            <button class="nav-item" onclick="exportData()" aria-label="Exporter les données">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exporter
+            </button>
+
             <hr style="border-color:var(--border);margin:8px 0;">
             <div style="padding:8px 16px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Contacts Linkchat!</div>
-            <div id="sidebarContacts"></div>
-            <button class="nav-item" onclick="addContact()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><span>Ajouter contact</span></button>
+            <div id="sidebarContacts" aria-live="polite"></div>
+            <button class="nav-item" onclick="addContact()" aria-label="Ajouter un contact">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                Ajouter
+            </button>
         </nav>
         <div class="sidebar-footer"><p>© 2024 David Laurens Kokoura • DAVIESLAY</p></div>
-    </div>
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()" tabindex="-1"></div>
 
     <!-- CONTAINER PRINCIPAL -->
-    <div class="chat-container">
-        <div class="chat-header">
-            <button class="menu-btn" onclick="toggleSidebar()" title="Menu">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/></svg>
+    <main class="chat-container" role="main">
+        <header class="chat-header" role="banner">
+            <button class="menu-btn" onclick="toggleSidebar()" title="Menu" aria-label="Ouvrir le menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/></svg>
             </button>
-            <div class="avatar" id="headerAvatar">A</div>
-            <div class="header-info"><h2 id="headerTitle">ALVACOA</h2><p><span class="status-dot"></span> <span id="headerStatus">Assistant IA</span></p></div>
+            <div class="avatar" id="headerAvatar" aria-hidden="true">A</div>
+            <div class="header-info"><h2 id="headerTitle">ALVACOA</h2><p><span class="status-dot" aria-hidden="true"></span> <span id="headerStatus">Assistant IA</span></p></div>
             <div class="header-actions">
+                <label for="modelSelect" class="sr-only">Choisir le modèle</label>
                 <select class="model-select" id="modelSelect" onchange="changeModel()">
-    <option value="mistral-small">🌬️ Mistral Small</option>
-    <option value="gemini-1.5-flash">⚠️ Gemini (si dispo)</option>
-    <option value="deepseek-chat-v2">🐋 DeepSeek V2</option>
-    <option value="claude-3.5-sonnet">🧬 Claude 3.5 Sonnet</option>
-    <option value="alvacoa">🔑 ALVACOA Local</option>
+                    <option value="mistral-small">🌬️ Mistral Small</option>
+                    <option value="gemini-1.5-flash">⚠️ Gemini (si dispo)</option>
+                    <option value="deepseek-chat-v2">🐋 DeepSeek V2</option>
+                    <option value="claude-3.5-sonnet">🧬 Claude 3.5 Sonnet</option>
+                    <option value="alvacoa">🔑 ALVACOA Local</option>
                 </select>
-                <button class="icon-btn" id="apiToggleBtn" onclick="toggleAPIMode()" title="API"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-                <button class="icon-btn" onclick="openTrainModal()" title="Apprendre"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></button>
+                <button class="icon-btn" id="apiToggleBtn" onclick="toggleAPIMode()" title="Basculer API" aria-pressed="false" aria-label="Activer le mode API">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/></svg>
+                </button>
+                <button class="icon-btn" onclick="openTrainModal()" title="Apprendre" aria-label="Apprendre au modèle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2 17 12 22 22 17"/></svg>
+                </button>
             </div>
-        </div>
+        </header>
 
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="typing-status" id="typingStatus"></div>
-                <div class="chat-input-area">
+        <section class="chat-messages" id="chatMessages" aria-live="polite" aria-label="Messages"></section>
+        <div class="typing-status" id="typingStatus" aria-hidden="true"></div>
+
+        <form class="chat-input-area" onsubmit="event.preventDefault(); sendMessage();" aria-label="Saisie de message">
             <div class="input-wrapper">
-                <button class="attach-btn" onclick="openUploadMenu()" title="Joindre"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
-                <textarea class="chat-input" id="chatInput" rows="1" placeholder="Message ou dictée vocale..." onkeydown="handleKeyDown(event)"></textarea>
-                <div class="audio-bars" id="audioBars"><span></span><span></span><span></span><span></span><span></span></div>
+                <button type="button" class="attach-btn" onclick="openUploadMenu()" title="Joindre" aria-label="Joindre un fichier">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l7.5-7.5a4 4 0 1 1 5.66 5.66l-6.36 6.36"/></svg>
+                </button>
+                <textarea class="chat-input" id="chatInput" rows="1" placeholder="Message ou dictée vocale..." onkeydown="handleKeyDown(event)" aria-label="Message"></textarea>
+                <div class="audio-bars" id="audioBars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
             </div>
-            <button class="mic-btn" id="micBtn" onclick="toggleMicrophone()" title="Micro"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-            <button class="send-btn" onclick="sendMessage()" title="Envoyer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
-        </div>
+            <button type="button" class="mic-btn" id="micBtn" onclick="toggleMicrophone()" title="Micro" aria-label="Activer le microphone">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 1v11"/><path d="M17 11a5 5 0 0 1-10 0"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+            </button>
+            <button type="submit" class="send-btn" title="Envoyer" aria-label="Envoyer le message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 21L23 12 2 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </form>
 
-        <div class="footer-pill">
-            <button class="pill-tab active" id="pillAlvacoa" onclick="switchTab('alvacoa')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>ALVACOA</span></button>
-            <button class="pill-tab" id="pillLinkchat" onclick="switchTab('linkchat')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>Linkchat!</span></button>
-        </div>
-    </div>
+        <nav class="footer-pill" role="tablist" aria-label="Navigation des onglets">
+            <button class="pill-tab active" id="pillAlvacoa" onclick="switchTab('alvacoa')" role="tab" aria-selected="true">ALVACOA</button>
+            <button class="pill-tab" id="pillLinkchat" onclick="switchTab('linkchat')" role="tab" aria-selected="false">Linkchat!</button>
+        </nav>
+    </main>
 
     <!-- MODALS -->
-    <div class="modal" id="uploadModal">
+    <div class="modal" id="uploadModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content">
-            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Joindre</h3>
+            <h3>Joindre un fichier</h3>
             <div class="upload-options">
-                <button onclick="triggerFileInput('image/*')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Photo</span></button>
-                <button onclick="triggerFileInput('video/*')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span>Vidéo</span></button>
-                <button onclick="triggerFileInput('*/*')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span>Fichier</span></button>
-                <button onclick="triggerCamera()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Caméra</span></button>
+                <button type="button" onclick="triggerFileInput('image/*')" aria-label="Joindre une image">Image</button>
+                <button type="button" onclick="triggerFileInput('video/*')" aria-label="Joindre une vidéo">Vidéo</button>
+                <button type="button" onclick="triggerFileInput('*/*')" aria-label="Joindre un fichier">Fichier</button>
+                <button type="button" onclick="triggerCamera()" aria-label="Prendre une photo">Caméra</button>
             </div>
-            <div class="preview-grid" id="previewGrid"></div>
-            <div class="modal-actions"><button class="btn-primary" onclick="confirmUpload()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>OK, Publier</button><button class="btn-secondary" onclick="closeUploadMenu()">Fermer</button></div>
+            <div class="preview-grid" id="previewGrid" aria-live="polite"></div>
+            <div class="modal-actions"><button class="btn-primary" onclick="confirmUpload()">Envoyer</button><button class="btn-secondary" onclick="closeUploadMenu()">Fermer</button></div>
             <input type="file" id="fileInput" multiple hidden onchange="handleFileSelect(event)">
             <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden onchange="handleFileSelect(event)">
         </div>
     </div>
 
-    <div class="modal" id="trainModal">
+    <div class="modal" id="trainModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content">
-            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Apprendre</h3>
-            <input type="text" id="trainQuestion" placeholder="Mot-clé ou question"><textarea id="trainAnswer" placeholder="Réponse..."></textarea>
+            <h3>Apprendre au modèle</h3>
+            <label class="sr-only" for="trainQuestion">Question</label>
+            <input type="text" id="trainQuestion" placeholder="Mot-clé ou question">
+            <label class="sr-only" for="trainAnswer">Réponse</label>
+            <textarea id="trainAnswer" placeholder="Réponse..."></textarea>
             <div class="modal-actions"><button class="btn-primary" onclick="trainAI()">Enregistrer</button><button class="btn-secondary" onclick="closeTrainModal()">Fermer</button></div>
         </div>
     </div>
 
-    <div class="modal" id="settingsModal">
+    <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content">
-            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Paramètres</h3>
+            <h3>Paramètres</h3>
             <div class="settings-group"><h4>Apparence</h4>
                 <div class="setting-row"><span>Thème</span><select id="themeSelect" onchange="changeTheme()"><option value="dark">Sombre</option><option value="light">Clair</option></select></div>
                 <div class="setting-row"><span>Texte</span><select id="fontSizeSelect" onchange="changeFontSize()"><option value="small">Petit</option><option value="medium" selected>Moyen</option><option value="large">Grand</option></select></div>
             </div>
             <div class="settings-group"><h4>API</h4>
-                <div class="setting-row"><span>URL</span><input type="text" id="apiUrlSetting"></div>
+                <div class="setting-row"><span>URL</span><input type="text" id="apiUrlSetting" placeholder="https://..."></div>
                 <div class="setting-row"><span>Modèle par défaut</span>
                     <select id="defaultModelSelect">
                         <option value="gemini-1.5-flash">⚡ Gemini 1.5 Flash</option>
@@ -149,15 +183,15 @@
                 <div class="setting-row"><span>Pseudo</span><input type="text" id="usernameSetting" placeholder="Votre nom"></div>
             </div>
             <div class="settings-group"><h4>PWA</h4>
-                <div class="setting-row"><span>Icônes</span><button class="btn-primary" onclick="regenerateIcons()" style="font-size:11px;padding:6px 10px;">Regénérer</button></div>
-                <div class="setting-row"><span>Cache</span><button class="btn-secondary" onclick="clearPWACache()" style="font-size:11px;padding:6px 10px;">Vider</button></div>
+                <div class="setting-row"><span>Icônes</span><button class="btn-primary" onclick="regenerateIcons()">Regénérer</button></div>
+                <div class="setting-row"><span>Cache</span><button class="btn-secondary" onclick="clearPWACache()">Vider</button></div>
             </div>
             <div class="modal-actions"><button class="btn-primary" onclick="saveSettings()">Sauvegarder</button><button class="btn-secondary" onclick="closeSettings()">Fermer</button></div>
         </div>
     </div>
 
     <!-- PORTAIL API -->
-    <div class="modal" id="apiPortalModal">
+    <div class="modal" id="apiPortalModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content" style="max-width:620px;">
             <div class="api-portal-header">
                 <div class="api-logo">A</div>
@@ -166,7 +200,7 @@
             <div class="api-section">
                 <h4>🔐 Créer une nouvelle clé</h4>
                 <div class="setting-row"><span>Nom</span><input type="text" id="newKeyName" placeholder="ex: MonApp" style="flex:1;margin-left:10px;"></div>
-                <div class="setting-row"><span>Niveau</span><select id="newKeyTier" style="margin-left:10px;"><option value="basic">Basic - 100 req/j</option><option value="pro">Pro - 1000 req/j</option><option value="enterprise">Enterprise - Illimité</option></select></div>
+                <div class="setting-row"><span>Niveau</span><select id="newKeyTier" style="margin-left:10px;"><option value="basic">Basic - 100 req/j</option><option value="pro">Pro - 1000 req/j</option></select></div>
                 <div class="setting-row"><span>Modèle</span>
                     <select id="newKeyModel" style="margin-left:10px;">
                         <option value="alvacoa-local">ALVACOA Local</option>
@@ -176,11 +210,11 @@
                         <option value="alvacoa-claude-3.5-sonnet">ALVACOA + Claude 3.5 Sonnet</option>
                     </select>
                 </div>
-                <button class="btn-primary" onclick="generateAPIKey()" style="width:100%;margin-top:8px;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Générer la clé API</button>
+                <button class="btn-primary" onclick="generateAPIKey()" style="width:100%;margin-top:8px;justify-content:center;">Générer la clé</button>
             </div>
             <div class="api-key-display" id="newKeyDisplay" style="display:none;">
-                <div class="api-key-header"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span style="color:#22c55e;font-weight:600;">Clé générée !</span></div>
-                <div class="key-box"><code id="generatedKey">sk-alvacoa-v4-xxxx</code><button class="copy-btn" onclick="copyAPIKey()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button></div>
+                <div class="api-key-header"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                <div class="key-box"><code id="generatedKey">sk-alvacoa-v4-xxxx</code><button class="copy-btn" onclick="copyAPIKey()">Copier</button></div>
                 <p style="font-size:11px;color:var(--red);margin-top:8px;">⚠️ Conservez cette clé en sécurité.</p>
             </div>
             <div class="api-section"><h4>📋 Mes clés API</h4><div id="apiKeysList"><p style="color:var(--text-muted);text-align:center;padding:20px;">Aucune clé</p></div></div>
@@ -199,15 +233,15 @@
         </div>
     </div>
 
-    <div class="modal" id="historyModal">
+    <div class="modal" id="historyModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content">
-            <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Historique</h3>
+            <h3>Historique</h3>
             <div class="history-list" id="historyList"></div>
             <div class="modal-actions"><button class="btn-secondary" onclick="closeHistory()">Fermer</button></div>
         </div>
     </div>
 
-    <div class="modal" id="aboutModal">
+    <div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content about-content">
             <div class="about-header"><div class="about-avatar">A</div><h3>ALVACOA v4.0</h3></div>
             <p>Messagerie instantanée & Assistant IA avec API Développeur</p>
@@ -222,7 +256,7 @@
         </div>
     </div>
 
-    <div class="modal" id="addContactModal">
+    <div class="modal" id="addContactModal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content">
             <h3>Ajouter un contact</h3>
             <input type="text" id="contactName" placeholder="Nom"><input type="text" id="contactId" placeholder="ID">
@@ -240,4 +274,4 @@
     <script src="ui.js"></script>
     <script src="app.js"></script>
 </body>
-    </html>
+</html>
