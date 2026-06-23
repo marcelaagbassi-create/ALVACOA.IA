@@ -98,7 +98,9 @@ function loadMessages() {
     chatMessages.innerHTML = '';
     const msgs = currentTab === 'alvacoa' ? currentSession : (activeContact?.messages || []);
     msgs.forEach(msg => { const type = currentTab === 'alvacoa' ? msg.type : (msg.from === 'me' ? 'user' : 'contact'); const sender = currentTab === 'linkchat' && msg.from === 'contact' ? activeContact?.name : null; addMessageToDOM(type, msg.content, msg.source || 'local', msg.attachment, sender); });
-    if (!msgs.length) { chatMessages.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-secondary);text-align:center;padding:40px 16px;min-height:220px;"><div style="width:92px;height:92px;background:linear-gradient(135deg,var(--accent),#a855f7);border-radius:18px;display:flex;align-items:center;justify-content:center;color:white;font-size:32px;font-weight:700;">A</div><div style="font-size:15px;color:var(--text-primary);opacity:0.95;">ALVACOA</div><div style="font-size:13px;color:var(--text-muted);">Assistant IA · API Developer</div></div>`; }
+    if (!msgs.length) { chatMessages.innerHTML = `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-secondary);text-align:center;padding:40px 16px;min-height:220px;">` +
+        `<div style="width:92px;height:92px;background:linear-gradient(135deg,var(--accent),#a855f7);border-radius:18px;display:flex;align-items:center;justify-content:center;color:white;font-size:32px;font-weight:700;">A</div>` +
+        `<div style="font-size:15px;color:var(--text-primary);opacity:0.95;">ALVACOA</div><div style="font-size:13px;color:var(--text-muted);">Assistant IA · API Developer</div></div>`; }
 }
 function addMessageToDOM(type, content, source = 'local', attachment = null, senderName = null) {
     const div = document.createElement('div'); div.className = `message ${type}`;
@@ -158,7 +160,7 @@ function removeFile(i) { URL.revokeObjectURL(pendingFiles[i].url); pendingFiles.
 function confirmUpload() { closeUploadMenu(); if (pendingFiles.length > 0 || chatInput.value.trim()) sendMessage(); }
 
 // Micro
-async function toggleMicrophone() { const btn = document.getElementById('micBtn'), bars = document.getElementById('audioBars'); if (isRecording) { stopRecording(); return; } try { const stream = await navigator.mediaDevices.getUserMedia({ audio:true }); mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => audioChunks.push(e.data); mediaRecorder.onstop = async () => { const blob = new Blob(audioChunks, { type: 'audio/webm' }); const url = URL.createObjectURL(blob); pendingFiles.push({ name: 'recording.webm', type: 'audio/webm', size: blob.size, url, file: blob }); updatePreviewGrid(); addMessage('user', 'Enregistrement', 'local', { type: 'file', url, name: 'recording.webm' }); }; mediaRecorder.start(); isRecording = true; document.getElementById('micBtn').classList.add('recording'); bars.classList.add('active'); } catch(e) { addMessage('assistant', 'Microphone non disponible', 'local'); } }
+async function toggleMicrophone() { const btn = document.getElementById('micBtn'), bars = document.getElementById('audioBars'); if (isRecording) { stopRecording(); return; } try { const stream = await navigator.mediaDevices.getUserMedia({ audio:true }); mediaRecorder = new MediaRecorder(stream); audioChunks = []; mediaRecorder.ondataavailable = e => audioChunks.push(e.data); mediaRecorder.onstop = async () => { const blob = new Blob(audioChunks, { type: 'audio/webm' }); const url = URL.createObjectURL(blob); pendingFiles.push({ name: 'recording.webm', type: 'audio/webm', size: blob.size, url, file: blob }); updatePreviewGrid(); addMessage('user', 'Enregistrement', 'local', { type: 'file', url, name: 'recording.webm' }); }; mediaRecorder.start(); isRecording = true; document.getElementById('micBtn').classList.add('recording'); document.getElementById('audioBars').classList.add('active'); } catch(e) { addMessage('assistant', 'Microphone non disponible', 'local'); } }
 function stopRecording() { if (mediaRecorder && isRecording) { mediaRecorder.stop(); isRecording = false; document.getElementById('micBtn').classList.remove('recording'); document.getElementById('audioBars').classList.remove('active'); } }
 
 // Sidebar
@@ -168,6 +170,19 @@ function closeSettings() { document.getElementById('settingsModal').classList.re
 function saveSettings() { API_URL = document.getElementById('apiUrlSetting').value; selectedModel = document.getElementById('defaultModelSelect').value; username = document.getElementById('usernameSetting').value || username; localStorage.setItem('alvacoa_default_model', selectedModel); localStorage.setItem('alvacoa_username', username); addMessage('assistant', 'Paramètres sauvegardés', 'local'); closeSettings(); }
 function changeTheme() { const t = document.getElementById('themeSelect').value; document.body.classList.toggle('light-theme', t === 'light'); localStorage.setItem('alvacoa_theme', t); const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', t === 'dark' ? '#0b1220' : '#6366f1'); }
 function changeFontSize() { const s = document.getElementById('fontSizeSelect').value; const sizes = { small:'13px', medium:'14px', large:'16px' }; document.documentElement.style.setProperty('--font-size', sizes[s] || '14px'); localStorage.setItem('alvacoa_font_size', s); }
+
+// Theme toggle helper
+function toggleTheme() {
+    const current = localStorage.getItem('alvacoa_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.body.classList.toggle('light-theme', next === 'light');
+    localStorage.setItem('alvacoa_theme', next);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', next === 'dark' ? '#0b1220' : '#6366f1');
+    const themeSel = document.getElementById('themeSelect'); if (themeSel) themeSel.value = next;
+    const btn = document.getElementById('themeToggleBtn'); if (btn) btn.setAttribute('aria-pressed', String(next === 'dark'));
+}
+
 function clearAllData() { if (confirm('Effacer TOUT ?')) { localStorage.clear(); location.reload(); } }
 function openHistory() { toggleSidebar(); document.getElementById('historyModal').classList.add('active'); document.getElementById('historyList').innerHTML = chatHistory.length ? chatHistory.slice().reverse().map(h => `<div class="history-item" onclick="loadHistory('${h.id}')"><strong>${h.title || 'Session'}</strong><div style=\"font-size:12px;color:var(--text-muted);\">${new Date(h.createdAt || h.timestamp || Date.now()).toLocaleString()}</div></div>`).join('') : '<p style="color:var(--text-muted);text-align:center;padding:20px;">Aucun historique</p>' }
 function closeHistory() { document.getElementById('historyModal').classList.remove('active'); }
